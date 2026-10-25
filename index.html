@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>J.F. Ankersen | Engineering Portfolio</title>
+  <meta name="description" content="Engineering, mathematical modelling, control and automation.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="#top" class="logo">JF<span>Ankersen</span></a>
+      <nav>
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero container">
+      <p class="eyebrow">Engineering portfolio</p>
+      <h1>Engineering, mathematical modelling,<br>control &amp; automation.</h1>
+      <p class="lead">
+        I design embedded systems, PCBs and control algorithms, from the first model
+        to working hardware. Below is a selection of my projects.
+      </p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">See projects</a>
+        <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="container section">
+      <div class="section-head">
+        <h2>Projects</h2>
+        <p class="muted"><span id="project-count"></span> projects</p>
+      </div>
+
+      <!-- Filter buttons are generated from the categories in js/projects.js -->
+      <div class="filters" id="filters" role="toolbar" aria-label="Filter projects by category"></div>
+
+      <div class="grid" id="project-grid"></div>
+      <p class="empty" id="empty-state" hidden>No projects in this category yet.</p>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="container section about">
+      <h2>About</h2>
+      <div class="about-grid">
+        <p>
+          Write a few lines about yourself here: your education, what you work with,
+          and what kind of problems you like to solve.
+        </p>
+        <ul class="skills">
+          <li>C / Embedded C</li>
+          <li>STM32</li>
+          <li>KiCad</li>
+          <li>Control theory</li>
+          <li>MATLAB / Python</li>
+          <li>Optimization</li>
+          <li>Automation</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container section contact">
+      <h2>Contact</h2>
+      <p>Want to talk about a project? Reach out:</p>
+      <div class="hero-actions">
+        <a href="mailto:you@example.com" class="btn btn-primary">Email</a>
+        <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
+        <a href="https://www.linkedin.com/" class="btn">LinkedIn</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© <span id="year"></span> J.F. Ankersen</div>
+  </footer>
+
+  <script src="js/projects.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
