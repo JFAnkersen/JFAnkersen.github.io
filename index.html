@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>J.F. Ankersen | Engineering Portfolio</title>
   <meta name="description" content="Engineering, mathematical modelling, control and automation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,23 +24,35 @@
 
   <main id="top">
     <!-- Hero -->
-    <section class="hero container">
-      <p class="eyebrow">Engineering portfolio</p>
-      <h1>Engineering, mathematical modelling,<br>control &amp; automation.</h1>
-      <p class="lead">
-        I design embedded systems, PCBs and control algorithms, from the first model
-        to working hardware. Below is a selection of my projects.
-      </p>
-      <div class="hero-actions">
-        <a href="#projects" class="btn btn-primary">See projects</a>
-        <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">Engineering portfolio</p>
+        <h1>Engineering, mathematical modelling,<br><span class="accent">control &amp; automation.</span></h1>
+        <p class="lead">
+          I design embedded systems, PCBs and control algorithms, from the first model
+          to working hardware. Below is a selection of my projects.
+        </p>
+        <div class="hero-actions">
+          <a href="#featured" class="btn btn-primary">See featured project</a>
+          <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
+        </div>
+        <ul class="stats">
+          <li><strong>Embedded</strong><span>STM32 · C</span></li>
+          <li><strong>Hardware</strong><span>KiCad · 3D print</span></li>
+          <li><strong>Control</strong><span>Modelling · PID</span></li>
+        </ul>
       </div>
+    </section>
+
+    <!-- Featured project: built from the first project with featured: true in js/projects.js -->
+    <section class="container section">
+      <article class="featured" id="featured"></article>
     </section>
 
     <!-- Projects -->
     <section id="projects" class="container section">
       <div class="section-head">
-        <h2>Projects</h2>
+        <h2>All projects</h2>
         <p class="muted"><span id="project-count"></span> projects</p>
       </div>
 
@@ -60,6 +75,7 @@
           <li>C / Embedded C</li>
           <li>STM32</li>
           <li>KiCad</li>
+          <li>3D printing</li>
           <li>Control theory</li>
           <li>MATLAB / Python</li>
           <li>Optimization</li>
@@ -70,12 +86,15 @@
 
     <!-- Contact -->
     <section id="contact" class="container section contact">
-      <h2>Contact</h2>
-      <p>Want to talk about a project? Reach out:</p>
-      <div class="hero-actions">
-        <a href="mailto:you@example.com" class="btn btn-primary">Email</a>
-        <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
-        <a href="https://www.linkedin.com/" class="btn">LinkedIn</a>
+      <div class="contact-box">
+        <h2>Let's talk</h2>
+        <p>Want to talk about a project? Reach out:</p>
+        <div class="hero-actions">
+          <a href="mailto:you@example.com" class="btn btn-primary">Email</a>
+          <a href="https://github.com/JFAnkersen" class="btn">GitHub</a>
+          <a href="https://www.linkedin.com/" class="btn">LinkedIn</a>
+          <a href="https://www.youtube.com/" class="btn">YouTube</a>
+        </div>
       </div>
     </section>
   </main>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight Controller | J.F. Ankersen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <!-- Template for a project page: copy this file, rename it and change the text -->
+  <header class="site-header">
+    <div class="container nav">
+      <a href="../index.html" class="logo">JF<span>Ankersen</span></a>
+      <nav>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container project-page">
+    <a href="../index.html#projects" class="back">← All projects</a>
+    <p class="eyebrow">Featured project · Embedded, hardware &amp; app</p>
+    <h1>Flight Controller</h1>
+    <p class="lead">
+      A complete drone system built from scratch: a custom STM32 flight controller,
+      a companion app and a 3D-printed frame designed around the electronics.
+    </p>
+    <ul class="tags">
+      <li>STM32</li><li>C</li><li>PID</li><li>KiCad</li><li>App</li><li>3D print</li>
+    </ul>
+
+    <!-- Main video: replace VIDEO_ID with the 11 characters after "watch?v=" or "youtu.be/" in your link.
+         No video yet? Delete this block and use the <figure> with an image below instead. -->
+    <div class="video">
+      <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+              title="Flight controller demo" allowfullscreen
+              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe>
+    </div>
+
+    <div class="parts">
+      <div class="part">
+        <span class="part-icon" aria-hidden="true">⚡</span>
+        <h3>Flight controller</h3>
+        <p>STM32 firmware and a custom PCB.</p>
+      </div>
+      <div class="part">
+        <span class="part-icon" aria-hidden="true">📱</span>
+        <h3>App</h3>
+        <p>Setup, tuning and live telemetry.</p>
+      </div>
+      <div class="part">
+        <span class="part-icon" aria-hidden="true">🧩</span>
+        <h3>3D-printed concept</h3>
+        <p>Frame and enclosure made to fit.</p>
+      </div>
+    </div>
+
+    <h2>The idea</h2>
+    <p>What were you trying to build, and why? What should the finished drone be able to do?</p>
+
+    <!-- 1. Flight controller -->
+    <h2>⚡ Flight controller</h2>
+    <p>Describe the hardware and firmware: microcontroller, sensors, control loop and PCB.</p>
+    <ul>
+      <li>STM32 microcontroller running the control loop at X Hz</li>
+      <li>IMU readout and complementary / Kalman filter</li>
+      <li>Cascaded PID controller for attitude and rate</li>
+      <li>PCB designed in KiCad: power supply, sensors and motor outputs</li>
+    </ul>
+    <figure>
+      <div class="card-media"><div class="placeholder">PCB</div></div>
+      <!-- <img src="../img/fc-pcb.jpg" alt="Flight controller PCB"> -->
+      <figcaption>Replace with a photo of the board or a KiCad render.</figcaption>
+    </figure>
+
+    <!-- 2. App -->
+    <h2>📱 App</h2>
+    <p>What does the app do, and how does it talk to the drone (Bluetooth, Wi-Fi, USB)? Which platform is it built for?</p>
+    <figure>
+      <div class="card-media"><div class="placeholder">App</div></div>
+      <!-- <img src="../img/fc-app.png" alt="Screenshot of the app"> -->
+      <figcaption>Replace with screenshots of the app.</figcaption>
+    </figure>
+
+    <!-- 3. 3D-printed concept -->
+    <h2>🧩 3D-printed concept</h2>
+    <p>How was the frame designed? Which CAD tool and material did you use, and how many iterations did it take?</p>
+    <figure>
+      <div class="card-media"><div class="placeholder">3D</div></div>
+      <!-- <img src="../img/fc-frame.jpg" alt="3D-printed frame"> -->
+      <figcaption>Replace with a CAD render or a photo of the printed frame.</figcaption>
+    </figure>
+
+    <h2>Results</h2>
+    <p>What works? Show measurements, plots or flight videos.</p>
+
+    <h2>What I learned</h2>
+    <p>Key takeaways and what you would do differently next time.</p>
+
+    <p class="hero-actions">
+      <a href="https://github.com/JFAnkersen" class="btn btn-primary">View code on GitHub</a>
+      <a href="../index.html#projects" class="btn">← Back to projects</a>
+    </p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© J.F. Ankersen</div>
+  </footer>
+</body>
+</html>
