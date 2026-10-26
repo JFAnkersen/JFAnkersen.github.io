@@ -4,7 +4,8 @@
 //
 //   category : must be one of the keys in CATEGORIES below
 //   tags     : free text, shown as small labels on the card
-//   image    : path to an image in /img, e.g. "img/fc.jpg" (leave "" for none)
+//   image    : path to an image in the project's own img folder,
+//              e.g. "img/flight-controller/pcb.jpg" (leave "" for none)
 //   video    : YouTube link or video ID (optional). If there is no image,
 //              the video's YouTube thumbnail is used on the card.
 //   page     : link to a project page (projects/xxx.html) or ""
@@ -64,16 +65,6 @@ const PROJECTS = [
     summary: "Tool that automates a repetitive workflow. Replace with your own project.",
     category: "software",
     tags: ["Python", "Automation"],
-    image: "",
-    page: "",
-    repo: "",
-    featured: false,
-  },
-  {
-    title: "Roblox game",
-    summary: "Hobby game built in Roblox Studio with Lua scripting.",
-    category: "other",
-    tags: ["Lua", "Roblox"],
     image: "",
     page: "",
     repo: "",

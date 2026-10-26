@@ -60,7 +60,8 @@ css/style.css              All styling. Colors are CSS variables in :root (+ dar
 js/projects.js             ← THE PROJECT LIST. Most content changes happen here
 js/main.js                 Builds the featured project, filter buttons and cards from projects.js
 projects/<name>.html       One page per project (flight-controller.html is the template)
-img/                       Images (create it when the first image is added)
+img/frontpage/             Images for the front page (hero, about, etc.)
+img/<project>/             One image folder per project, named like its page (img/flight-controller/)
 tools/serve.ps1            Local preview server (not part of the site)
 ```
 
@@ -73,7 +74,7 @@ Each project is one object in `PROJECTS`:
 | `title`, `summary` | Card title and one- or two-sentence description |
 | `category` | A key from `CATEGORIES` (embedded, pcb, control, software, other). Filter buttons only appear for categories in use |
 | `tags` | Short labels, e.g. `["STM32", "C"]` |
-| `image` | `"img/file.jpg"` or `""` |
+| `image` | `"img/<project>/file.jpg"` or `""` |
 | `video` | Any YouTube link or 11-char ID. Without an `image`, the card uses the YouTube thumbnail and gets a "▶ Video" link |
 | `page` | `"projects/<name>.html"` or `""` |
 | `repo` | GitHub link or `""` |
@@ -81,12 +82,16 @@ Each project is one object in `PROJECTS`:
 | `parts` | Optional `[{icon, title, text}]`, shown as boxes under the featured project |
 
 For a new project page: copy `projects/flight-controller.html`, rename it, change the text,
-and set `page` in projects.js.
+set `page` in projects.js, and create a matching `img/<name>/` folder (with a short README.txt
+so git keeps the folder while it's empty).
 
 ### Images
 
-- He puts images in `img/` (or tells you where they are, e.g. Desktop or Downloads, and you copy them in).
-- Use lowercase file names without spaces (`fc-pcb.jpg`).
+- Front-page images go in `img/frontpage/`, project images in that project's folder
+  (`img/flight-controller/`). He drops them there, or tells you where they are
+  (e.g. Desktop or Downloads) and you copy them in.
+- From a project page, the path is relative: `../img/flight-controller/pcb.jpg`.
+- Use lowercase file names without spaces (`pcb.jpg`).
 - Large photos: scale them down to about 1600 px wide before committing so the site stays fast.
   Use PowerShell/.NET `System.Drawing`, since no Python is available.
 - Always set a meaningful `alt` text.
@@ -112,7 +117,8 @@ and set `page` in projects.js.
 - Featured project: **Flight Controller** (firmware + app + 3D-printed concept).
   The texts about the app and the 3D print are **placeholders that Claude guessed**.
   Ask him for the real details. No images or video yet.
-- The other projects (Optimizer, Dynamic system model, Automation script, Roblox game)
-  are **example placeholders**. Replace or remove them when he gives real projects.
+- Image folders exist: `img/frontpage/` and `img/flight-controller/` (empty so far).
+- The other projects (Optimizer, Dynamic system model, Automation script)
+  are **example placeholders**. The Roblox example was removed at his request. Replace or remove them when he gives real projects.
 - About section text, the contact email (`you@example.com`) and the YouTube channel link
   are still placeholders.
