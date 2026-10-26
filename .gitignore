@@ -1,1 +1,3 @@
-.claude/
+# Local Claude settings stay on each PC; the preview config is shared
+.claude/*
+!.claude/launch.json
