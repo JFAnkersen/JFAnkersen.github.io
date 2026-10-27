@@ -25,6 +25,7 @@ const CATEGORIES = {
   pcb:       "Electronics & PCB",
   control:   "Modelling & control",
   software:  "Automation & software",
+  household: "Household appliances",
   other:     "Other",
 };
 
@@ -55,6 +56,17 @@ const PROJECTS = [
     image: "img/blade-simulator/blade-test-card.svg",
     imageAlt: "Drawing of a wind turbine blade bolted to a large test stand, with a clamp on the blade connected to a blade exciter on the floor",
     page: "projects/blade-simulator.html",
+    repo: "",
+    featured: false,
+  },
+  {
+    title: "Retro AC Valve Floor Heater",
+    summary: "8-channel floor heating controller that drives existing 230 V AC valves and the pump, with one knob per room.",
+    category: "household",
+    tags: ["Arduino", "230 VAC", "Triac", "PCB", "3D printing"],
+    image: "img/floor-heater/floor-heater.jpg",
+    imageAlt: "The floor heater controller: a black 3D-printed box and a control panel with eight knobs",
+    page: "projects/floor-heater.html",
     repo: "",
     featured: false,
   },

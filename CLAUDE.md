@@ -178,5 +178,11 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   Load timeline: gravity ramp 0–5 s (flap), excitation from 10 s (flap) / 0 s (edge) with a 10 s ramp.
   Not yet done: a side-by-side check against his MATLAB results on one of his own blades.
   Node is installed on this PC (only needed for the engine test, not for the site).
+- **Retro AC Valve Floor Heater** (`projects/floor-heater.html`, images in `img/floor-heater/`, card category
+  `household` = "Household appliances", added at his request). Kept deliberately shorter than the other two pages.
+  Source material: `Desktop\UniversalControls\FloorHeater` (photo, Danish setup guide and spec sheet as JPGs, plus a
+  CE DoC PDF with the technical details: HLK-PM01 supply, 8 opto-isolated triac outputs with 2 A slow-blow fuses,
+  Arduino Nano Every, control panel with pots/button/LED on a 2 m cable). On universalcontrols.dk it is only a short
+  "Older Projects" teaser. A dashed `.todo` paragraph is waiting for his text on how the knob setting controls the valves.
 - The contact email (`you@example.com`) and the YouTube channel link
   are still placeholders.

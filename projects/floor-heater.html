@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retro AC Valve Floor Heater | J.F. Ankersen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="../index.html" class="logo">JF<span>Ankersen</span></a>
+      <nav>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container project-page">
+    <a href="../index.html#projects" class="back">← All projects</a>
+    <p class="eyebrow">Household appliances · Power electronics · PCB design</p>
+    <h1>Retro AC Valve Floor Heater</h1>
+    <p class="lead">
+      An 8-channel floor heating controller for homes that already have 230 V AC valves.
+      It drives the existing valves directly, so nothing in the floor has to be replaced.
+    </p>
+    <ul class="tags">
+      <li>Arduino Nano Every</li><li>230 VAC</li><li>Triac</li><li>PCB</li><li>FreeCAD</li><li>3D printing</li>
+    </ul>
+
+    <figure class="hero-figure">
+      <a href="../img/floor-heater/floor-heater.jpg">
+        <img src="../img/floor-heater/floor-heater.jpg" alt="The floor heater controller: a black 3D-printed main box with ventilation slots and a green PCB inside, a mains plug, and a separate control panel with eight knobs on a grey cable">
+      </a>
+      <figcaption>Main box (left) and the control panel with one knob per heating zone (right).</figcaption>
+    </figure>
+
+    <h2>How it works</h2>
+    <p>
+      The controller is built from two boards. The main board sits in the vented box and has an Arduino Nano Every,
+      eight triac outputs for the valves and a 230 VAC output for the circulation pump. Each output is fused, and the
+      triac gates are opto-isolated from the microcontroller. The control panel is connected by a 2 m cable and has
+      one knob per zone, a button and an LED. You turn a knob to set how much heat that room gets.
+    </p>
+    <p class="todo">How the knob setting is turned into valve control (e.g. how long each valve is open) is still to be written.</p>
+
+    <dl class="specs">
+      <div><dt>Supply</dt><dd>230 VAC, single phase</dd></div>
+      <div><dt>Channels</dt><dd>8 × AC valve outputs + pump</dd></div>
+      <div><dt>Load</dt><dd>20–90 W nominal, 120 W max</dd></div>
+      <div><dt>MCU</dt><dd>Arduino Nano Every</dd></div>
+      <div><dt>Main box</dt><dd>242 × 136 × 49 mm</dd></div>
+      <div><dt>Control panel</dt><dd>160 × 56 × 27 mm</dd></div>
+    </dl>
+
+    <h2>Setup and documentation</h2>
+    <p>
+      Installing it takes four connections: the control panel (already connected), the valves, the pump and the mains plug.
+      The pages below are from the Danish user guide.
+    </p>
+    <div class="slideshow">
+      <div class="slides">
+        <figure class="slide">
+          <img src="../img/floor-heater/setup-guide.jpg" alt="Setup guide (in Danish): the main board with numbered connections for the control panel, eight valves, the pump output and the 230 VAC input">
+          <figcaption>Setup guide: (1) control panel, (2) the eight valves, (3) pump output and (4) mains input.</figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="../img/floor-heater/specifications.jpg" alt="Specification table (in Danish): supply, number of channels, max and nominal load, and the dimensions of the two boards">
+          <figcaption>Specifications from the user guide.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <p>
+      The PCBs are assembled by JLCPCB, and the enclosures are designed in FreeCAD and 3D-printed. The thermal load was
+      checked with a FLIR camera. The project is also shown on <a href="https://universalcontrols.dk">universalcontrols.dk</a>.
+    </p>
+
+    <p class="hero-actions">
+      <a href="https://universalcontrols.dk" class="btn btn-primary">Universal Controls</a>
+      <a href="../index.html#projects" class="btn">← Back to projects</a>
+    </p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© J.F. Ankersen</div>
+  </footer>
+
+  <script src="../js/slideshow.js"></script>
+</body>
+</html>
