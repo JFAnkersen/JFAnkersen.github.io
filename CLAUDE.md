@@ -59,6 +59,7 @@ index.html                 Front page: hero, featured project, all projects, abo
 css/style.css              All styling. Colors are CSS variables in :root (+ dark mode block)
 js/projects.js             ← THE PROJECT LIST. Most content changes happen here
 js/main.js                 Builds the featured project, filter buttons and cards from projects.js
+js/slideshow.js            Adds arrows + dots to every .slideshow on a project page
 projects/<name>.html       One page per project (flight-controller.html is the template)
 img/frontpage/             Images for the front page (hero, about, etc.)
 img/<project>/             One image folder per project, named like its page (img/flight-controller/)
@@ -95,6 +96,10 @@ so git keeps the folder while it's empty).
 - Large photos: scale them down to about 1600 px wide before committing so the site stays fast.
   Use PowerShell/.NET `System.Drawing`, since no Python is available.
 - Always set a meaningful `alt` text.
+- On project pages, pictures go in slideshows, not in piles: one `<figure class="slide">` per picture
+  inside `<div class="slideshow"><div class="slides">`. Add a picture by adding a slide.
+  `slideshow small` = half width (used for the PDB). One slide = no arrows. The page must load
+  `../js/slideshow.js`.
 
 ### YouTube videos
 
@@ -127,8 +132,10 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   from Shotcut first (his Videos folder only has `.mlt` project files).
   Box 2 under the featured project is the 3D-printed frame (`frame-base.png`).
   The project page has dashed `.todo` paragraphs where his own text is still missing
-  (firmware, bench app, results, lessons). Idea, PDB and 3D-print texts are his own.
-  Section order: idea, flight controller, PDB (half-size images), bench app (images coming),
+  (bench app, results, lessons). Idea, flight controller (PX4-inspired, STM32H743VIT6, spec bullets),
+  PDB and 3D-print texts are his own. ESC protocol (PWM/OneShot/DShot) is still unknown, so it's left out.
+  The bench app section has a commented-out slideshow ready for his app screenshots.
+  Section order: idea, flight controller, PDB (half-size slideshow), bench app (images coming),
   two ways to fly, 3D print, results, lessons.
 - Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.
   Put scaled copies with clean names next to it.

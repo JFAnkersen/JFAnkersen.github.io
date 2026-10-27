@@ -52,7 +52,7 @@
 
     <dl class="specs">
       <div><dt>Board</dt><dd>Universal Quad Controller Rev1</dd></div>
-      <div><dt>MCU</dt><dd>STM32</dd></div>
+      <div><dt>MCU</dt><dd>STM32H743VIT6</dd></div>
       <div><dt>Power</dt><dd>3S–4S LiPo</dd></div>
       <div><dt>Motors</dt><dd>4 × ESC outputs</dd></div>
       <div><dt>Interfaces</dt><dd>2 × UART, GPS/MAG, DroneCAN, I²C, SWD</dd></div>
@@ -65,41 +65,70 @@
       algorithms such as MPC, talk to a companion IPC and potentially connect to QGroundControl.
     </p>
 
+    <!-- Slideshows: each <figure class="slide"> is one picture. To add a picture, copy a
+         <figure class="slide"> block inside the same slideshow and change the file name,
+         alt text and caption. Arrows and dots are added automatically by js/slideshow.js. -->
+
     <!-- 1. Flight controller -->
     <h2>Flight controller</h2>
-    <p class="todo">Describe the firmware: control loop rate, sensors and filtering, how the PID loops are set up.</p>
+    <p>
+      A universal quadcopter flight controller, designed with inspiration from the PX4 / Pixhawk
+      flight controllers. The aim is the same open, modular approach, and owning the flight hardware.
+    </p>
     <ul>
-      <li>STM32 microcontroller running the control loop</li>
-      <li>On-board power supply straight from a 3S–4S LiPo</li>
-      <li>Four ESC outputs, two UARTs, GPS/compass port, DroneCAN and I²C</li>
-      <li>PCB designed in KiCad</li>
+      <li><strong>MCU:</strong> STM32H743VIT6</li>
+      <li><strong>On-board power supply:</strong> direct 3S–4S LiPo input, regulated 5 V and 3.3 V rails</li>
+      <li><strong>Four ESC outputs</strong> for X-configuration quads</li>
+      <li><strong>1 kHz attitude control loop:</strong> cascaded PID (angle and rate)</li>
+      <li><strong>Receiver input:</strong> SBUS / ELRS on UART1</li>
+      <li><strong>Telemetry:</strong> UART2 for a wireless telemetry radio to the bench app</li>
+      <li><strong>GPS/compass port</strong> for position hold and navigation</li>
+      <li><strong>DroneCAN and I²C</strong> for expansion</li>
+      <li><strong>SWD</strong> for programming and debugging</li>
     </ul>
-    <div class="gallery">
-      <figure>
-        <a href="../img/flight-controller/fc-render-top.png"><img src="../img/flight-controller/fc-render-top.png" alt="KiCad render of the flight controller seen from above" loading="lazy"></a>
-        <figcaption>KiCad render, top view with all connectors labelled.</figcaption>
-      </figure>
-      <figure>
-        <a href="../img/flight-controller/fc-render-3d.png"><img src="../img/flight-controller/fc-render-3d.png" alt="3D render of the flight controller" loading="lazy"></a>
-        <figcaption>3D render of the populated board.</figcaption>
-      </figure>
+    <div class="slideshow">
+      <div class="slides">
+        <figure class="slide">
+          <a href="../img/flight-controller/fc-render-top.png"><img src="../img/flight-controller/fc-render-top.png" alt="KiCad render of the flight controller seen from above"></a>
+          <figcaption>KiCad render, top view with all connectors labelled.</figcaption>
+        </figure>
+        <figure class="slide">
+          <a href="../img/flight-controller/fc-render-3d.png"><img src="../img/flight-controller/fc-render-3d.png" alt="3D render of the flight controller"></a>
+          <figcaption>3D render of the populated board.</figcaption>
+        </figure>
+        <figure class="slide">
+          <a href="../img/flight-controller/fc-photo.jpg"><img src="../img/flight-controller/fc-photo.jpg" alt="The assembled flight controller"></a>
+          <figcaption>The assembled board.</figcaption>
+        </figure>
+      </div>
     </div>
 
     <!-- 2. Power distribution board -->
     <h2>Power distribution board</h2>
     <p>A simple, rugged PDB.</p>
-    <div class="gallery small">
-      <figure>
-        <a href="../img/flight-controller/pdb-render.png"><img src="../img/flight-controller/pdb-render.png" alt="Render of the power distribution board" loading="lazy"></a>
-        <figcaption>Battery in (V_Bat), four ESC outputs and an extra V_ext output.</figcaption>
-      </figure>
-      <figure>
-        <a href="../img/flight-controller/pdb-photo.jpg"><img src="../img/flight-controller/pdb-photo.jpg" alt="Photo of the manufactured power distribution board" loading="lazy"></a>
-        <figcaption>The manufactured board.</figcaption>
-      </figure>
+    <div class="slideshow small">
+      <div class="slides">
+        <figure class="slide">
+          <a href="../img/flight-controller/pdb-render.png"><img src="../img/flight-controller/pdb-render.png" alt="Render of the power distribution board"></a>
+          <figcaption>Battery in (V_Bat), four ESC outputs and an extra V_ext output.</figcaption>
+        </figure>
+        <figure class="slide">
+          <a href="../img/flight-controller/pdb-photo.jpg"><img src="../img/flight-controller/pdb-photo.jpg" alt="Photo of the manufactured power distribution board"></a>
+          <figcaption>The manufactured board.</figcaption>
+        </figure>
+      </div>
     </div>
 
-    <!-- 3. Bench app -->
+    <!-- 3. Bench app: add screenshots as slides here when they are ready
+    <div class="slideshow">
+      <div class="slides">
+        <figure class="slide">
+          <a href="../img/flight-controller/app-1.png"><img src="../img/flight-controller/app-1.png" alt="Bench app screenshot"></a>
+          <figcaption>Caption.</figcaption>
+        </figure>
+      </div>
+    </div>
+    -->
     <h2>Bench app</h2>
     <p class="todo">What does the bench app do (setup, tuning, live data)? What is it written in? Add a screenshot when you have one.</p>
 
@@ -108,14 +137,18 @@
     <p>
       The same board covers a simple setup and a fully connected one.
     </p>
-    <figure>
-      <a href="../img/flight-controller/wiring-minimal.png"><img src="../img/flight-controller/wiring-minimal.png" alt="Wiring diagram for minimal flight mode" loading="lazy"></a>
-      <figcaption><strong>Minimal flight mode:</strong> receiver, battery, PDB and four ESCs. Nothing else needed to fly.</figcaption>
-    </figure>
-    <figure>
-      <a href="../img/flight-controller/wiring-gps-telemetry.png"><img src="../img/flight-controller/wiring-gps-telemetry.png" alt="Wiring diagram for GPS and wireless telemetry mode" loading="lazy"></a>
-      <figcaption><strong>GPS &amp; wireless telemetry mode:</strong> adds a GPS module and a telemetry radio that talks to the bench app on a laptop.</figcaption>
-    </figure>
+    <div class="slideshow">
+      <div class="slides">
+        <figure class="slide">
+          <a href="../img/flight-controller/wiring-minimal.png"><img src="../img/flight-controller/wiring-minimal.png" alt="Wiring diagram for minimal flight mode"></a>
+          <figcaption><strong>Minimal flight mode:</strong> receiver, battery, PDB and four ESCs. Nothing else needed to fly.</figcaption>
+        </figure>
+        <figure class="slide">
+          <a href="../img/flight-controller/wiring-gps-telemetry.png"><img src="../img/flight-controller/wiring-gps-telemetry.png" alt="Wiring diagram for GPS and wireless telemetry mode"></a>
+          <figcaption><strong>GPS &amp; wireless telemetry mode:</strong> adds a GPS module and a telemetry radio that talks to the bench app on a laptop.</figcaption>
+        </figure>
+      </div>
+    </div>
 
     <!-- 5. 3D-printed concept -->
     <h2>3D-printed concept</h2>
@@ -123,10 +156,14 @@
       Running Claude with MCP and FreeCAD is highly recommendable if you're on a budget.
       This powerful open-source setup has let me optimize my drone frames at a surprisingly quick rate.
     </p>
-    <figure>
-      <a href="../img/flight-controller/frame-base.png"><img src="../img/flight-controller/frame-base.png" alt="The 3D-printable frame base on the slicer's build plate" loading="lazy"></a>
-      <figcaption>Frame base, ready to slice.</figcaption>
-    </figure>
+    <div class="slideshow">
+      <div class="slides">
+        <figure class="slide">
+          <a href="../img/flight-controller/frame-base.png"><img src="../img/flight-controller/frame-base.png" alt="The 3D-printable frame base on the slicer's build plate"></a>
+          <figcaption>Frame base, ready to slice.</figcaption>
+        </figure>
+      </div>
+    </div>
 
     <h2>Results</h2>
     <p class="todo">What works? Show measurements, plots or flight videos.</p>
@@ -143,5 +180,7 @@
   <footer class="site-footer">
     <div class="container">© J.F. Ankersen</div>
   </footer>
+
+  <script src="../js/slideshow.js"></script>
 </body>
 </html>

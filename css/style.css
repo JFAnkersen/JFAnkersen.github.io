@@ -400,15 +400,53 @@ img { max-width: 100%; display: block; }
   background: #fff;
 }
 .project-page .hero-figure { margin-top: 8px; }
-.project-page .gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  align-items: start;
+/* Slideshow: one picture at a time, arrows + dots added by js/slideshow.js */
+.slideshow { position: relative; margin: 24px 0; container-type: inline-size; }
+/* Half-size slideshow for small parts (e.g. the PDB) */
+.slideshow.small { max-width: 50%; }
+.slides {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
-.project-page .gallery figure { margin: 0; }
-/* Half-size gallery for small parts (e.g. the PDB) */
-.project-page .gallery.small { max-width: 50%; }
+.slides::-webkit-scrollbar { display: none; }
+.project-page .slide { flex: 0 0 100%; margin: 0; scroll-snap-align: start; }
+.project-page .slide img {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: var(--surface);
+}
+.slide-arrow {
+  position: absolute;
+  /* vertically centred on the picture (16:10), not on picture + caption */
+  top: calc(31.25cqw - 20px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  color: var(--text);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.slide-arrow.prev { left: 10px; }
+.slide-arrow.next { right: 10px; }
+.slide-arrow:hover { border-color: var(--accent); }
+.slide-arrow:disabled { opacity: 0; pointer-events: none; }
+.slide-dots { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.slide-dots button {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+}
+.slide-dots button[aria-current="true"] { background: var(--accent); }
 
 .specs {
   display: grid;
@@ -459,9 +497,7 @@ img { max-width: 100%; display: block; }
 }
 
 @media (max-width: 560px) {
-  .project-page .gallery { grid-template-columns: 1fr; }
-  /* On phones the small gallery keeps two images side by side instead of stacking */
-  .project-page .gallery.small { max-width: none; grid-template-columns: 1fr 1fr; }
+  .slideshow.small { max-width: 75%; }
   .specs { grid-template-columns: 1fr; }
 }
 
