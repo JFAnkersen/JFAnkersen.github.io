@@ -153,7 +153,7 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
 - The About section and its menu links were removed at his request (front page + project page).
 - "Learnings" (his text) and "Key changes for a new revision" are on the project page. The Rev2
   bullets come from his KiCad project `Documents\KiCad\9.0\projects\Quad_Rev2\Rev2_changes.csv`.
-- Axis slide caption says yaw 0° = x north, 90° = x east (compass style, clockwise). The diagram's
-  yaw arrow is CCW (right-hand rule for x north, y west, z up). Those two disagree; flagged to him.
+- Yaw convention (confirmed by him): CCW positive seen from above (right-hand rule, x north,
+  y west, z up). Axis slide caption: yaw 0° = x north, −90° = x east.
 - The contact email (`you@example.com`) and the YouTube channel link
   are still placeholders.
