@@ -139,6 +139,10 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   his body frame (NWU: x north, y west, z up) and motor layout (M1/M3 CW, M2/M4 CCW), with the board
   render embedded as base64. To change it, edit `originals/axis-definition-template.svg` and replace
   `BOARD_B64` with a base64 640 px JPEG of `fc-render-top.png`. It has its own light/dark colors.
+  The roll and pitch arrows follow his own sketch: an open loop that crosses in front of the axis,
+  with a gap where it passes behind. Roll goes up on the right and over the top, arrowhead at upper
+  left pointing down. Pitch goes over the top, arrowhead at lower left pointing right. Yaw is CCW
+  seen from above. All three follow the right-hand rule.
   Section order: idea, flight controller, PDB (half-size slideshow), bench app (images coming),
   two ways to fly, 3D print, results, lessons.
 - Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.
