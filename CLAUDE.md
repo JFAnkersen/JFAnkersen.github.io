@@ -150,5 +150,10 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
 - `img/frontpage/` is still empty.
 - The other projects (Optimizer, Dynamic system model, Automation script)
   are **example placeholders**. The Roblox example was removed at his request. Replace or remove them when he gives real projects.
-- About section text, the contact email (`you@example.com`) and the YouTube channel link
+- The About section and its menu links were removed at his request (front page + project page).
+- "Learnings" (his text) and "Key changes for a new revision" are on the project page. The Rev2
+  bullets come from his KiCad project `Documents\KiCad\9.0\projects\Quad_Rev2\Rev2_changes.csv`.
+- Axis slide caption says yaw 0° = x north, 90° = x east (compass style, clockwise). The diagram's
+  yaw arrow is CCW (right-hand rule for x north, y west, z up). Those two disagree; flagged to him.
+- The contact email (`you@example.com`) and the YouTube channel link
   are still placeholders.

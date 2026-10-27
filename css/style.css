@@ -339,31 +339,6 @@ img { max-width: 100%; display: block; }
 
 .empty { color: var(--muted); }
 
-/* ---------- About ---------- */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 32px;
-}
-.about-grid p { margin: 0; color: var(--muted); }
-
-.skills {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-content: flex-start;
-}
-.skills li {
-  padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  font-size: 0.9rem;
-}
-
 /* ---------- Contact ---------- */
 .contact-box {
   padding: 40px;
@@ -390,6 +365,7 @@ img { max-width: 100%; display: block; }
 .project-page { padding-top: 48px; padding-bottom: 64px; max-width: 860px; }
 .project-page h1 { font-size: clamp(2rem, 4.5vw, 2.8rem); letter-spacing: -0.03em; margin: 8px 0 12px; }
 .project-page h2 { margin-top: 48px; font-size: 1.4rem; letter-spacing: -0.01em; }
+.project-page h3 { margin-top: 32px; font-size: 1.1rem; }
 .project-page p, .project-page li { color: var(--muted); }
 .project-page figure { margin: 24px 0; }
 .project-page figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
@@ -504,6 +480,5 @@ img { max-width: 100%; display: block; }
 @media (max-width: 700px) {
   .nav nav { gap: 14px; }
   .hero { padding: 56px 0 44px; }
-  .about-grid { grid-template-columns: 1fr; gap: 20px; }
   .contact-box { padding: 24px; }
 }

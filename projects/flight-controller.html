@@ -16,7 +16,6 @@
       <a href="../index.html" class="logo">JF<span>Ankersen</span></a>
       <nav>
         <a href="../index.html#projects">Projects</a>
-        <a href="../index.html#about">About</a>
         <a href="../index.html#contact">Contact</a>
       </nav>
     </div>
@@ -102,7 +101,10 @@
         </figure>
         <figure class="slide">
           <a href="../img/flight-controller/axis-definition.svg"><img src="../img/flight-controller/axis-definition.svg" alt="Top view of the quad: body axes x north, y west, z up, and motors M1 to M4 with their spin directions"></a>
-          <figcaption>Motor, frame and axis definitions</figcaption>
+          <figcaption>
+            <strong>Motor, frame and axis definitions.</strong>
+            When the body x axis points north, yaw is 0°. When it points east, yaw is 90°.
+          </figcaption>
         </figure>
       </div>
     </div>
@@ -192,8 +194,29 @@
     <h2>Results</h2>
     <p class="todo">What works? Show measurements, plots or flight videos.</p>
 
-    <h2>What I learned</h2>
-    <p class="todo">Key takeaways and what you would do differently next time.</p>
+    <h2>Learnings</h2>
+    <ul>
+      <li>A barometer must be on the FC for decent altitude hold.</li>
+      <li>Motor noise is a pain with cheap ICM IMUs. Filtering only goes so far to attenuate it.</li>
+      <li>Mechanical rigidity, and a notch filter tuned to the frame's first mode, are critical
+        with plastic frames and cheap, poorly balanced motors.</li>
+    </ul>
+
+    <h3>Key changes for a new revision</h3>
+    <p>If I ever do a new revision, these will be the key changes:</p>
+    <ul>
+      <li><strong>Barometer on board</strong> (DPS368) for altitude hold.</li>
+      <li><strong>New IMU:</strong> ICM-45686 on SPI, replacing the ICM-20948 that needed its own
+        1.8 V supply and five level shifters.</li>
+      <li><strong>USB-C with DFU boot,</strong> so the board can be flashed and configured without a
+        programmer. 3.3 V now comes from the 5 V rail, so USB alone powers the MCU.</li>
+      <li><strong>microSD card</strong> for flight logging.</li>
+      <li><strong>Pixhawk-style ports:</strong> all connectors are JST-GH with Pixhawk pinouts, plus a
+        second telemetry port, two extra UARTs, a second I²C bus and a battery current input.</li>
+      <li><strong>4-layer PCB</strong> with a solid ground plane and standard 30.5 × 30.5 mm mounting.</li>
+      <li><strong>Rev1 fixes:</strong> battery diode orientation, battery voltage divider and a TVS
+        diode rated for a higher battery voltage.</li>
+    </ul>
 
     <p class="hero-actions">
       <a href="https://github.com/JFAnkersen" class="btn btn-primary">View code on GitHub</a>
