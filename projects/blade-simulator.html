@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blade Fatigue Test Simulator | J.F. Ankersen</title>
+  <meta name="description" content="Simulate a resonant fatigue test of a wind turbine blade in your browser: natural modes, deflection, bending moments and exciter power.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/blade-sim.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="../index.html" class="logo">JF<span>Ankersen</span></a>
+      <nav>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container sim-page">
+    <a href="../index.html#projects" class="back">← All projects</a>
+    <p class="eyebrow">Simulation · Structural dynamics · Test engineering</p>
+    <h1>Blade Fatigue Test Simulator</h1>
+    <p class="lead">
+      Simulate a resonant fatigue test of a wind turbine blade, right here in your browser.
+      Pick a blade, place the exciter and clamps, choose a test frequency, and see how the blade swings,
+      which bending moments it gets and how much power the exciter needs.
+    </p>
+    <ul class="tags">
+      <li>Structural dynamics</li><li>Finite elements</li><li>Modal analysis</li><li>Fatigue testing</li><li>JavaScript</li><li>MATLAB</li>
+    </ul>
+
+    <!-- ===== 1. Input ===== -->
+    <section class="sim-section" id="input">
+      <div class="sim-head">
+        <h2><span class="step">1</span> Blade and test setup</h2>
+      </div>
+
+      <div class="sim-panel source" id="drop-zone">
+        <div class="source-actions">
+          <button class="btn btn-primary" id="btn-generic" type="button">Generic blade (NREL 5 MW)</button>
+          <label class="btn" for="file-input">Open your own file…</label>
+          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.txt" hidden>
+          <button class="btn" id="btn-download" type="button">Download input as CSV</button>
+        </div>
+        <p class="source-info" id="source-info"></p>
+        <p class="hint">CSV or Excel in the <a href="#format">input format</a> below. You can also drop a file here.
+          Your file is read in your browser and is never uploaded.</p>
+        <div class="messages" id="messages" hidden></div>
+      </div>
+
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>Test setup</h3>
+          <div class="form">
+            <div class="field wide">
+              <span class="label">Test type</span>
+              <div class="segmented" role="radiogroup" aria-label="Test type">
+                <button type="button" data-type="Flap" role="radio">Flapwise</button>
+                <button type="button" data-type="Edge" role="radio">Edgewise</button>
+              </div>
+            </div>
+            <label class="field wide">
+              <span class="label">Test frequency F<sub>test</sub> <span class="unit">[Hz]</span></span>
+              <span class="slider-row">
+                <input type="range" id="ftest-range" min="0.05" max="5" step="0.001">
+                <input type="number" id="ftest" min="0.01" step="0.001">
+              </span>
+              <span class="note" id="ftest-note"></span>
+            </label>
+            <label class="field" data-flap-only>
+              <span class="label">Tilt <span class="unit">[deg]</span></span>
+              <input type="number" id="tilt" step="0.5" min="-30" max="45">
+            </label>
+            <label class="field" data-flap-only>
+              <span class="label">Rig height <span class="unit">[m]</span></span>
+              <input type="number" id="rig-height" step="0.5" min="0">
+            </label>
+            <label class="field">
+              <span class="label">Simulation time <span class="unit">[s]</span></span>
+              <input type="number" id="sim-time" step="5" min="20" max="600">
+            </label>
+            <label class="field">
+              <span class="label">Damping β <span class="unit">[1/s]</span></span>
+              <input type="number" id="beta" step="0.01" min="0">
+            </label>
+          </div>
+
+          <h4>Exciters <span class="unit">(sine force, same phase)</span></h4>
+          <table class="edit-table" id="exciter-table">
+            <thead><tr><th>Position [m]</th><th>Peak force [N]</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="btn small" id="add-exciter" type="button">+ Add exciter</button>
+
+          <h4>Clamps and masses <span class="unit">(incl. the exciter's moving mass)</span></h4>
+          <table class="edit-table" id="clamp-table">
+            <thead><tr><th>Position [m]</th><th>Mass [kg]</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="btn small" id="add-clamp" type="button">+ Add clamp</button>
+        </div>
+
+        <div class="sim-panel">
+          <h3>Blade properties</h3>
+          <dl class="mini-stats" id="blade-stats"></dl>
+          <canvas class="chart" id="chart-ei" aria-label="Bending stiffness along the blade"></canvas>
+          <canvas class="chart" id="chart-mu" aria-label="Mass per metre along the blade"></canvas>
+          <details class="data-table">
+            <summary>Show all blade data (<span id="station-count">0</span> stations)</summary>
+            <div class="table-wrap"><table id="station-table"></table></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 2. Natural frequencies ===== -->
+    <section class="sim-section" id="modes">
+      <div class="sim-head">
+        <h2><span class="step">2</span> Natural frequencies</h2>
+      </div>
+      <div class="stat-row" id="mode-stats"></div>
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>Mode shapes</h3>
+          <canvas class="chart" id="chart-shapes" aria-label="The first three mode shapes"></canvas>
+        </div>
+        <div class="sim-panel">
+          <h3>Resonance curve <span class="unit">click to set F<sub>test</sub></span></h3>
+          <canvas class="chart" id="chart-resonance" aria-label="Tip amplitude versus test frequency"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 3. Simulation ===== -->
+    <section class="sim-section" id="simulation">
+      <div class="sim-head">
+        <h2><span class="step">3</span> Test simulation</h2>
+        <p class="muted small" id="compute-info"></p>
+      </div>
+
+      <div class="sim-panel">
+        <canvas class="rig" id="rig-canvas" aria-label="Animation of the blade in the test rig"></canvas>
+        <div class="player">
+          <button class="btn small" id="play" type="button" aria-label="Play or pause">❚❚</button>
+          <input type="range" id="time" min="0" max="1" step="0.01" aria-label="Simulation time">
+          <span class="time-label" id="time-label">0.0 s</span>
+          <select id="speed" aria-label="Playback speed">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+          <select id="exaggerate" aria-label="Deflection scale">
+            <option value="1" selected>True scale</option>
+            <option value="2">Deflection ×2</option>
+            <option value="5">Deflection ×5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stat-row" id="result-stats"></div>
+      <div class="messages" id="result-messages" hidden></div>
+
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>Tip deflection</h3>
+          <canvas class="chart" id="chart-tip"></canvas>
+        </div>
+        <div class="sim-panel">
+          <h3>Exciter power</h3>
+          <canvas class="chart" id="chart-power"></canvas>
+        </div>
+        <div class="sim-panel">
+          <h3>Deflection along the blade <span class="unit">steady state</span></h3>
+          <canvas class="chart" id="chart-wenv"></canvas>
+        </div>
+        <div class="sim-panel">
+          <h3>Bending moment along the blade <span class="unit">steady state</span></h3>
+          <canvas class="chart" id="chart-menv"></canvas>
+        </div>
+      </div>
+      <p class="hint">The blue band in the time plots is the steady-state window used for the envelopes and averages.</p>
+    </section>
+
+    <!-- ===== 4. Input format ===== -->
+    <section class="sim-section" id="format">
+      <h2>Input file format</h2>
+      <p class="muted">
+        One table, one row per blade station. Settings go in the first data row, and exciters and clamps take one row each.
+        This is the same layout as the Excel input files of the original MATLAB tool. The easiest start is to download the generic
+        blade above and replace the numbers. Excel files (.xlsx) can be opened directly. Column names are matched loosely,
+        so spacing and capital letters don't matter.
+      </p>
+      <div class="table-wrap">
+        <table class="format-table" id="format-table">
+          <thead><tr><th>Column</th><th>Type</th><th>Meaning</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 5. About ===== -->
+    <section class="sim-section" id="about">
+      <h2>How it works</h2>
+      <p class="muted">
+        The blade is modelled as an Euler-Bernoulli beam, clamped at the root, with 40 finite elements. Stiffness, mass and damping
+        vary along the span as given in the input. The simulator finds the first three natural modes. It then simulates each mode
+        as a mass-spring-damper, and adds the remaining modes as a static correction, so the gravity sag is exact. The load follows a test
+        sequence: gravity ramps in over 5 s (flapwise only). From 10 s (flapwise) or 0 s (edgewise), the exciter force ramps up over 10 s and then runs as a steady sine.
+      </p>
+      <p class="muted">
+        This is a re-write of my MATLAB simulator. It used an explicit finite-difference scheme that needed a time step of 0.00001 s
+        to stay stable. The modal method needs a few thousand steps for a whole test, so it runs in a fraction of a second.
+      </p>
+      <p class="muted">
+        Assumptions: small deflections, bending in one plane only (no flap-edge coupling or torsion), linear damping proportional to mass.
+        Clamps are point masses.
+      </p>
+      <p class="muted small">
+        Generic blade: the public NREL 5 MW reference blade (61.5 m), from J. Jonkman et al., <em>Definition of a 5-MW Reference Wind Turbine
+        for Offshore System Development</em>, NREL/TP-500-38060, 2009. Data from the
+        <a href="https://github.com/OpenFAST/r-test">OpenFAST r-test</a> repository (Apache 2.0). Clamps, exciter and damping are my own example values.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© J.F. Ankersen</div>
+  </footer>
+
+  <script type="module" src="../js/blade-sim/app.js"></script>
+</body>
+</html>

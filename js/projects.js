@@ -48,6 +48,16 @@ const PROJECTS = [
     ],
   },
   {
+    title: "Blade Fatigue Test Simulator",
+    summary: "Interactive simulator of a resonant fatigue test of a wind turbine blade: natural modes, deflection, bending moments and exciter power, running live in the browser.",
+    category: "control",
+    tags: ["Structural dynamics", "FEM", "Modal analysis", "JavaScript", "MATLAB"],
+    image: "",
+    page: "projects/blade-simulator.html",
+    repo: "",
+    featured: false,
+  },
+  {
     title: "Optimizer",
     summary: "Numerical optimization tool for tuning model parameters against measured data.",
     category: "control",

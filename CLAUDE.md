@@ -64,6 +64,15 @@ projects/<name>.html       One page per project (flight-controller.html is the t
 img/frontpage/             Images for the front page (hero, about, etc.)
 img/<project>/             One image folder per project, named like its page (img/flight-controller/)
 tools/serve.ps1            Local preview server (not part of the site)
+
+projects/blade-simulator.html   Interactive blade fatigue test simulator (see below)
+css/blade-sim.css               Its styling (uses the same color variables)
+js/blade-sim/engine.js          The physics: beam FEM → 3 modes → modal time simulation. No page code
+js/blade-sim/input.js           Reads/writes the input file (CSV or .xlsx, same columns as his MATLAB Excel files)
+js/blade-sim/charts.js          Small canvas line charts (no chart library)
+js/blade-sim/app.js             The page: form, charts, rig animation
+data/blade-sim/                 generic-blade-nrel5mw.csv: the public demo blade
+tools/blade-sim-test.mjs        Checks the engine against textbook results (node tools/blade-sim-test.mjs; not part of the site)
 ```
 
 ### Adding or editing a project: `js/projects.js`
@@ -155,5 +164,15 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   bullets come from his KiCad project `Documents\KiCad\9.0\projects\Quad_Rev2\Rev2_changes.csv`.
 - Yaw convention (confirmed by him): CCW positive seen from above (right-hand rule, x north,
   y west, z up). Axis slide caption: yaw 0° = x north, −90° = x east.
+- **Blade Fatigue Test Simulator** (`projects/blade-simulator.html`, card in projects.js, category control):
+  a browser port of his MATLAB tool (`Desktop\Dynamic Blade Modelling\Matlab Simulation`, explicit finite
+  differences with Δt = 1e-5 s). The web version uses beam finite elements + the first 3 modes + a static
+  correction instead, and runs a whole test in well under 0.1 s. Agreed plan: web version first, a MATLAB toolbox
+  with the same method later (to sell), kept in sync with shared test blades.
+  **His own blade input files (B108, B75, G97, LM64 data) must never be put on the site.** Only the public
+  NREL 5 MW blade (`data/blade-sim/`) is published; clamps, exciter and damping in it are example values.
+  Load timeline: gravity ramp 0–5 s (flap), excitation from 10 s (flap) / 0 s (edge) with a 10 s ramp.
+  Not yet done: a side-by-side check against his MATLAB results on one of his own blades.
+  Node is installed on this PC (only needed for the engine test, not for the site).
 - The contact email (`you@example.com`) and the YouTube channel link
   are still placeholders.
