@@ -29,7 +29,7 @@ function cardHtml(p) {
   // Own image first, otherwise the YouTube thumbnail, otherwise a letter
   const thumb = p.image || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "");
   const image = thumb
-    ? `<img src="${thumb}" alt="${escapeHtml(p.title)}" loading="lazy">`
+    ? `<img src="${thumb}" alt="${escapeHtml(p.imageAlt || p.title)}" loading="lazy">`
     : `<div class="placeholder" aria-hidden="true">${escapeHtml(p.title.charAt(0))}</div>`;
   const links = [
     p.page ? `<a href="${p.page}">Read more →</a>` : "",
@@ -63,7 +63,7 @@ function renderFeatured() {
       title="${escapeHtml(p.title)}" allowfullscreen
       allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`;
   } else if (p.image) {
-    media = `<img src="${p.image}" alt="${escapeHtml(p.title)}">`;
+    media = `<img src="${p.image}" alt="${escapeHtml(p.imageAlt || p.title)}">`;
   } else {
     media = `<div class="blueprint" aria-hidden="true">
       ${parts.map(part => `<span>${part.icon || "•"}</span>`).join("")}
@@ -73,7 +73,6 @@ function renderFeatured() {
   featured.innerHTML = `
     <div class="featured-media">${media}</div>
     <div class="featured-body">
-      <p class="eyebrow">Featured project</p>
       <h2>${escapeHtml(p.title)}</h2>
       <p class="lead">${escapeHtml(p.summary)}</p>
       ${tagsHtml(p.tags)}
@@ -85,7 +84,9 @@ function renderFeatured() {
     </div>
     ${parts.length ? `<div class="parts">${parts.map(part => `
       <div class="part">
-        <span class="part-icon" aria-hidden="true">${part.icon || ""}</span>
+        ${part.image
+          ? `<img class="part-img" src="${part.image}" alt="" loading="lazy">`
+          : `<span class="part-icon" aria-hidden="true">${part.icon || ""}</span>`}
         <h3>${escapeHtml(part.title)}</h3>
         <p>${escapeHtml(part.text)}</p>
       </div>`).join("")}</div>` : ""}`;

@@ -24,83 +24,105 @@
 
   <main class="container project-page">
     <a href="../index.html#projects" class="back">← All projects</a>
-    <p class="eyebrow">Featured project · Embedded, hardware &amp; app</p>
+    <p class="eyebrow">Embedded · PCB design · Telemetry</p>
     <h1>Flight Controller</h1>
     <p class="lead">
-      A complete drone system built from scratch: a custom STM32 flight controller,
-      a companion app and a 3D-printed frame designed around the electronics.
+      A complete quadcopter system built from scratch: a custom STM32 flight controller,
+      a matching power distribution board and a bench app for setup and live telemetry.
     </p>
     <ul class="tags">
-      <li>STM32</li><li>C</li><li>PID</li><li>KiCad</li><li>App</li><li>3D print</li>
+      <li>STM32</li><li>C</li><li>PID</li><li>KiCad</li><li>DroneCAN</li><li>GPS</li><li>Telemetry</li>
     </ul>
 
-    <!-- Main video: replace VIDEO_ID with the 11 characters after "watch?v=" or "youtu.be/" in your link.
-         No video yet? Delete this block and use the <figure> with an image below instead. -->
+    <figure class="hero-figure">
+      <a href="../img/flight-controller/fc-photo.jpg">
+        <img src="../img/flight-controller/fc-photo.jpg" alt="The assembled Universal Quad Controller Rev1 board">
+      </a>
+      <figcaption>Universal Quad Controller Rev1, assembled.</figcaption>
+    </figure>
+
+    <!-- Video: when there is one, add this block (replace VIDEO_ID with the 11 characters
+         after "watch?v=" or "youtu.be/" in the link):
     <div class="video">
       <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
               title="Flight controller demo" allowfullscreen
               allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe>
     </div>
+    -->
 
-    <div class="parts">
-      <div class="part">
-        <span class="part-icon" aria-hidden="true">⚡</span>
-        <h3>Flight controller</h3>
-        <p>STM32 firmware and a custom PCB.</p>
-      </div>
-      <div class="part">
-        <span class="part-icon" aria-hidden="true">📱</span>
-        <h3>App</h3>
-        <p>Setup, tuning and live telemetry.</p>
-      </div>
-      <div class="part">
-        <span class="part-icon" aria-hidden="true">🧩</span>
-        <h3>3D-printed concept</h3>
-        <p>Frame and enclosure made to fit.</p>
-      </div>
-    </div>
+    <dl class="specs">
+      <div><dt>Board</dt><dd>Universal Quad Controller Rev1</dd></div>
+      <div><dt>MCU</dt><dd>STM32</dd></div>
+      <div><dt>Power</dt><dd>3S–4S LiPo</dd></div>
+      <div><dt>Motors</dt><dd>4 × ESC outputs</dd></div>
+      <div><dt>Interfaces</dt><dd>2 × UART, GPS/MAG, DroneCAN, I²C, SWD</dd></div>
+      <div><dt>Extras</dt><dd>Secure chip, reset + 2 user buttons</dd></div>
+    </dl>
 
     <h2>The idea</h2>
-    <p>What were you trying to build, and why? What should the finished drone be able to do?</p>
+    <p class="todo">What were you trying to build, and why? What should the finished drone be able to do?</p>
 
     <!-- 1. Flight controller -->
-    <h2>⚡ Flight controller</h2>
-    <p>Describe the hardware and firmware: microcontroller, sensors, control loop and PCB.</p>
+    <h2>Flight controller</h2>
+    <p class="todo">Describe the firmware: control loop rate, sensors and filtering, how the PID loops are set up.</p>
     <ul>
-      <li>STM32 microcontroller running the control loop at X Hz</li>
-      <li>IMU readout and complementary / Kalman filter</li>
-      <li>Cascaded PID controller for attitude and rate</li>
-      <li>PCB designed in KiCad: power supply, sensors and motor outputs</li>
+      <li>STM32 microcontroller running the control loop</li>
+      <li>On-board power supply straight from a 3S–4S LiPo</li>
+      <li>Four ESC outputs, two UARTs, GPS/compass port, DroneCAN and I²C</li>
+      <li>PCB designed in KiCad</li>
     </ul>
+    <div class="gallery">
+      <figure>
+        <a href="../img/flight-controller/fc-render-top.png"><img src="../img/flight-controller/fc-render-top.png" alt="KiCad render of the flight controller seen from above" loading="lazy"></a>
+        <figcaption>KiCad render, top view with all connectors labelled.</figcaption>
+      </figure>
+      <figure>
+        <a href="../img/flight-controller/fc-render-3d.png"><img src="../img/flight-controller/fc-render-3d.png" alt="3D render of the flight controller" loading="lazy"></a>
+        <figcaption>3D render of the populated board.</figcaption>
+      </figure>
+    </div>
+
+    <!-- 2. Power distribution board -->
+    <h2>Power distribution board</h2>
+    <p class="todo">Why a separate PDB? Current rating, copper weight, how it connects to the flight controller.</p>
+    <div class="gallery">
+      <figure>
+        <a href="../img/flight-controller/pdb-render.png"><img src="../img/flight-controller/pdb-render.png" alt="Render of the power distribution board" loading="lazy"></a>
+        <figcaption>Battery in (V_Bat), four ESC outputs and an extra V_ext output.</figcaption>
+      </figure>
+      <figure>
+        <a href="../img/flight-controller/pdb-photo.jpg"><img src="../img/flight-controller/pdb-photo.jpg" alt="Photo of the manufactured power distribution board" loading="lazy"></a>
+        <figcaption>The manufactured board.</figcaption>
+      </figure>
+    </div>
+
+    <!-- 3. Wiring / setups -->
+    <h2>Two ways to fly</h2>
+    <p>
+      The same board covers a simple setup and a fully connected one.
+    </p>
     <figure>
-      <div class="card-media"><div class="placeholder">PCB</div></div>
-      <!-- <img src="../img/flight-controller/pcb.jpg" alt="Flight controller PCB"> -->
-      <figcaption>Replace with a photo of the board or a KiCad render.</figcaption>
+      <a href="../img/flight-controller/wiring-minimal.png"><img src="../img/flight-controller/wiring-minimal.png" alt="Wiring diagram for minimal flight mode" loading="lazy"></a>
+      <figcaption><strong>Minimal flight mode:</strong> receiver, battery, PDB and four ESCs. Nothing else needed to fly.</figcaption>
+    </figure>
+    <figure>
+      <a href="../img/flight-controller/wiring-gps-telemetry.png"><img src="../img/flight-controller/wiring-gps-telemetry.png" alt="Wiring diagram for GPS and wireless telemetry mode" loading="lazy"></a>
+      <figcaption><strong>GPS &amp; wireless telemetry mode:</strong> adds a GPS module and a telemetry radio that talks to the bench app on a laptop.</figcaption>
     </figure>
 
-    <!-- 2. App -->
-    <h2>📱 App</h2>
-    <p>What does the app do, and how does it talk to the drone (Bluetooth, Wi-Fi, USB)? Which platform is it built for?</p>
-    <figure>
-      <div class="card-media"><div class="placeholder">App</div></div>
-      <!-- <img src="../img/flight-controller/app.png" alt="Screenshot of the app"> -->
-      <figcaption>Replace with screenshots of the app.</figcaption>
-    </figure>
+    <!-- 4. Bench app -->
+    <h2>Bench app</h2>
+    <p class="todo">What does the bench app do (setup, tuning, live data)? What is it written in? Add a screenshot when you have one.</p>
 
-    <!-- 3. 3D-printed concept -->
-    <h2>🧩 3D-printed concept</h2>
-    <p>How was the frame designed? Which CAD tool and material did you use, and how many iterations did it take?</p>
-    <figure>
-      <div class="card-media"><div class="placeholder">3D</div></div>
-      <!-- <img src="../img/flight-controller/frame.jpg" alt="3D-printed frame"> -->
-      <figcaption>Replace with a CAD render or a photo of the printed frame.</figcaption>
-    </figure>
+    <!-- 5. 3D-printed concept -->
+    <h2>3D-printed concept</h2>
+    <p class="todo">How was the frame designed? Which CAD tool and material did you use? Add a render or photo when you have one.</p>
 
     <h2>Results</h2>
-    <p>What works? Show measurements, plots or flight videos.</p>
+    <p class="todo">What works? Show measurements, plots or flight videos.</p>
 
     <h2>What I learned</h2>
-    <p>Key takeaways and what you would do differently next time.</p>
+    <p class="todo">Key takeaways and what you would do differently next time.</p>
 
     <p class="hero-actions">
       <a href="https://github.com/JFAnkersen" class="btn btn-primary">View code on GitHub</a>

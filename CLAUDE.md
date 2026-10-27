@@ -114,10 +114,15 @@ so git keeps the folder while it's empty).
 
 - Headline: "Control, automation, mathematical modelling & Test Engineering."
 - Hero buttons: GitHub + LinkedIn (https://www.linkedin.com/in/jesper-ankersen-898b02195).
-- Featured project: **Flight Controller** (firmware + app + 3D-printed concept).
-  The texts about the app and the 3D print are **placeholders that Claude guessed**.
-  Ask him for the real details. No images or video yet.
-- Image folders exist: `img/frontpage/` and `img/flight-controller/` (empty so far).
+- The hero no longer has the three skill boxes, and the featured block has no "Featured project" label.
+- Featured project: **Flight Controller** ("Universal Quad Controller Rev1" + a separate PDB,
+  two wiring setups: minimal and GPS & wireless telemetry to a laptop "bench app").
+  Uses his photos, KiCad renders and wiring diagrams in `img/flight-controller/`.
+  The project page has dashed `.todo` paragraphs where his own text is still missing
+  (idea, firmware, PDB, bench app, 3D print, results, lessons). No video yet.
+- Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.
+  Put scaled copies with clean names next to it.
+- `img/frontpage/` is still empty.
 - The other projects (Optimizer, Dynamic system model, Automation script)
   are **example placeholders**. The Roblox example was removed at his request. Replace or remove them when he gives real projects.
 - About section text, the contact email (`you@example.com`) and the YouTube channel link

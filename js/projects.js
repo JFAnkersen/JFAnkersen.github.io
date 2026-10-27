@@ -12,7 +12,9 @@
 //   repo     : link to the GitHub repo or ""
 //   featured : true = shown as the big project at the top of the page
 //              (only the first featured project is used)
-//   parts    : optional list of sub-parts, shown on the featured project
+//   imageAlt : optional description of the image (for screen readers)
+//   parts    : optional list of sub-parts, shown on the featured project.
+//              Each part has an image (or an icon), a title and a text
 // ------------------------------------------------------------
 
 const CATEGORIES = {
@@ -26,18 +28,19 @@ const CATEGORIES = {
 const PROJECTS = [
   {
     title: "Flight Controller",
-    summary: "A complete drone system built from scratch: custom STM32 flight controller, a companion app and a 3D-printed frame designed around the electronics.",
+    summary: "A complete quadcopter system built from scratch: a custom STM32 flight controller, a matching power distribution board and a bench app for setup and live telemetry.",
     category: "embedded",
-    tags: ["STM32", "C", "PID", "KiCad", "App", "3D print"],
-    image: "",
+    tags: ["STM32", "C", "PID", "KiCad", "DroneCAN", "GPS", "Telemetry"],
+    image: "img/flight-controller/fc-photo.jpg",
+    imageAlt: "The assembled Universal Quad Controller Rev1 board",
     video: "",   // e.g. "https://www.youtube.com/watch?v=XXXXXXXXXXX"
     page: "projects/flight-controller.html",
     repo: "https://github.com/JFAnkersen",
     featured: true,
     parts: [
-      { icon: "⚡", title: "Flight controller", text: "STM32 firmware with sensor fusion and cascaded PID control, on a PCB designed in KiCad." },
-      { icon: "📱", title: "App", text: "Companion app for setup, tuning and live telemetry from the drone." },
-      { icon: "🧩", title: "3D-printed concept", text: "Frame and enclosure modelled and printed to fit the board, motors and battery." },
+      { image: "img/flight-controller/fc-render-3d.png", title: "Flight controller", text: "STM32 board designed in KiCad: 3S–4S LiPo input, four ESC outputs, GPS, DroneCAN, UART and I²C." },
+      { image: "img/flight-controller/pdb-photo.jpg", title: "Power distribution", text: "Matching PDB that splits the battery to the four ESCs and feeds the flight controller." },
+      { image: "img/flight-controller/wiring-gps-telemetry.png", title: "Setup & telemetry", text: "From a minimal receiver-only setup to GPS and a wireless link to the bench app." },
     ],
   },
   {

@@ -1,3 +1,6 @@
 # Local Claude settings stay on each PC; the preview config is shared
 .claude/*
 !.claude/launch.json
+
+# Full-size original photos stay on the PC; the site uses the scaled-down copies
+img/**/originals/
