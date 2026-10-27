@@ -134,7 +134,11 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   The project page has dashed `.todo` paragraphs where his own text is still missing
   (bench app, results, lessons). Idea, flight controller (PX4-inspired, STM32H743VIT6, spec bullets),
   PDB and 3D-print texts are his own. ESC protocol (PWM/OneShot/DShot) is still unknown, so it's left out.
-  The bench app section has a commented-out slideshow ready for his app screenshots.
+  The bench app text is his own; its section has a commented-out slideshow ready for his app screenshots.
+- `img/flight-controller/axis-definition.svg` (4th slide under Flight controller) is a hand-drawn SVG of
+  his body frame (NWU: x north, y west, z up) and motor layout (M1/M3 CW, M2/M4 CCW), with the board
+  render embedded as base64. To change it, edit `originals/axis-definition-template.svg` and replace
+  `BOARD_B64` with a base64 640 px JPEG of `fc-render-top.png`. It has its own light/dark colors.
   Section order: idea, flight controller, PDB (half-size slideshow), bench app (images coming),
   two ways to fly, 3D print, results, lessons.
 - Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.

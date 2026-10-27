@@ -100,6 +100,10 @@
           <a href="../img/flight-controller/fc-photo.jpg"><img src="../img/flight-controller/fc-photo.jpg" alt="The assembled flight controller"></a>
           <figcaption>The assembled board.</figcaption>
         </figure>
+        <figure class="slide">
+          <a href="../img/flight-controller/axis-definition.svg"><img src="../img/flight-controller/axis-definition.svg" alt="Top view of the quad: body axes x north, y west, z up, with roll, pitch and yaw, and motors M1 to M4 with their spin directions"></a>
+          <figcaption>Body frame (x north, y west, z up) and motor layout: M1 and M3 spin CW, M2 and M4 spin CCW.</figcaption>
+        </figure>
       </div>
     </div>
 
@@ -130,7 +134,27 @@
     </div>
     -->
     <h2>Bench app</h2>
-    <p class="todo">What does the bench app do (setup, tuning, live data)? What is it written in? Add a screenshot when you have one.</p>
+    <p>
+      The bench app holds the complete configuration of the flight controller. Everything is set up
+      once in the app and then saved to the FC's flash memory, including:
+    </p>
+    <ul>
+      <li>Flight mode</li>
+      <li>Physical drone parameters</li>
+      <li>Approximate hover throttle for takeoff</li>
+      <li>Control and state-estimation parameters and gains</li>
+      <li>Other settings</li>
+    </ul>
+    <p>
+      During flight the app records telemetry, either over a wired connection or through the
+      popular Holybro telemetry radio, which is supported out of the box.
+    </p>
+    <p>It also has a few smaller tools:</p>
+    <ul>
+      <li>Motor vibration analysis</li>
+      <li>Autotune for the attitude controller</li>
+      <li>Coordinate-frame validation for the ICM IMU and an external magnetometer</li>
+    </ul>
 
     <!-- 4. Wiring / setups -->
     <h2>Two ways to fly</h2>
