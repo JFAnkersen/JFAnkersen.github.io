@@ -60,7 +60,10 @@
     </dl>
 
     <h2>The idea</h2>
-    <p class="todo">What were you trying to build, and why? What should the finished drone be able to do?</p>
+    <p>
+      To develop a flight controller that works, and that can later host more exotic control
+      algorithms such as MPC, talk to a companion IPC and potentially connect to QGroundControl.
+    </p>
 
     <!-- 1. Flight controller -->
     <h2>Flight controller</h2>
@@ -84,8 +87,8 @@
 
     <!-- 2. Power distribution board -->
     <h2>Power distribution board</h2>
-    <p class="todo">Why a separate PDB? Current rating, copper weight, how it connects to the flight controller.</p>
-    <div class="gallery">
+    <p>A simple, rugged PDB.</p>
+    <div class="gallery small">
       <figure>
         <a href="../img/flight-controller/pdb-render.png"><img src="../img/flight-controller/pdb-render.png" alt="Render of the power distribution board" loading="lazy"></a>
         <figcaption>Battery in (V_Bat), four ESC outputs and an extra V_ext output.</figcaption>
@@ -96,7 +99,11 @@
       </figure>
     </div>
 
-    <!-- 3. Wiring / setups -->
+    <!-- 3. Bench app -->
+    <h2>Bench app</h2>
+    <p class="todo">What does the bench app do (setup, tuning, live data)? What is it written in? Add a screenshot when you have one.</p>
+
+    <!-- 4. Wiring / setups -->
     <h2>Two ways to fly</h2>
     <p>
       The same board covers a simple setup and a fully connected one.
@@ -110,13 +117,12 @@
       <figcaption><strong>GPS &amp; wireless telemetry mode:</strong> adds a GPS module and a telemetry radio that talks to the bench app on a laptop.</figcaption>
     </figure>
 
-    <!-- 4. Bench app -->
-    <h2>Bench app</h2>
-    <p class="todo">What does the bench app do (setup, tuning, live data)? What is it written in? Add a screenshot when you have one.</p>
-
     <!-- 5. 3D-printed concept -->
     <h2>3D-printed concept</h2>
-    <p class="todo">How was the frame designed? Which CAD tool and material did you use, and how many iterations did it take?</p>
+    <p>
+      Running Claude with MCP and FreeCAD is highly recommendable if you're on a budget.
+      This powerful open-source setup has let me optimize my drone frames at a surprisingly quick rate.
+    </p>
     <figure>
       <a href="../img/flight-controller/frame-base.png"><img src="../img/flight-controller/frame-base.png" alt="The 3D-printable frame base on the slicer's build plate" loading="lazy"></a>
       <figcaption>Frame base, ready to slice.</figcaption>

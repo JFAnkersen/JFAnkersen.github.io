@@ -407,6 +407,8 @@ img { max-width: 100%; display: block; }
   align-items: start;
 }
 .project-page .gallery figure { margin: 0; }
+/* Half-size gallery for small parts (e.g. the PDB) */
+.project-page .gallery.small { max-width: 50%; }
 
 .specs {
   display: grid;
@@ -458,6 +460,8 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 560px) {
   .project-page .gallery { grid-template-columns: 1fr; }
+  /* On phones the small gallery keeps two images side by side instead of stacking */
+  .project-page .gallery.small { max-width: none; grid-template-columns: 1fr 1fr; }
   .specs { grid-template-columns: 1fr; }
 }
 

@@ -127,7 +127,9 @@ GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps delet
   from Shotcut first (his Videos folder only has `.mlt` project files).
   Box 2 under the featured project is the 3D-printed frame (`frame-base.png`).
   The project page has dashed `.todo` paragraphs where his own text is still missing
-  (idea, firmware, PDB, bench app, 3D print, results, lessons). No video yet.
+  (firmware, bench app, results, lessons). Idea, PDB and 3D-print texts are his own.
+  Section order: idea, flight controller, PDB (half-size images), bench app (images coming),
+  two ways to fly, 3D print, results, lessons.
 - Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.
   Put scaled copies with clean names next to it.
 - `img/frontpage/` is still empty.
