@@ -58,7 +58,17 @@ function renderFeatured() {
   const videoId = youtubeId(p.video);
   const parts = p.parts || [];
   let media;
-  if (videoId) {
+  if (videoId && p.videoLoop) {
+    // Silent looping video with no YouTube controls. The image covers it until it plays.
+    const params = "autoplay=1&mute=1&loop=1&playlist=" + videoId +
+      "&controls=0&disablekb=1&fs=0&iv_load_policy=3&modestbranding=1&playsinline=1&rel=0&enablejsapi=1";
+    media = `<div class="video-loop">
+      <iframe id="loop-video" src="https://www.youtube-nocookie.com/embed/${videoId}?${params}"
+        title="${escapeHtml(p.title)}" tabindex="-1" aria-hidden="true"
+        allow="autoplay; encrypted-media"></iframe>
+      ${p.image ? `<img src="${p.image}" alt="${escapeHtml(p.imageAlt || p.title)}">` : ""}
+    </div>`;
+  } else if (videoId) {
     media = `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}"
       title="${escapeHtml(p.title)}" allowfullscreen
       allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`;
@@ -78,7 +88,7 @@ function renderFeatured() {
       ${tagsHtml(p.tags)}
       <div class="hero-actions">
         ${p.page ? `<a href="${p.page}" class="btn btn-primary">Read the full story →</a>` : ""}
-        ${videoId ? `<a href="https://www.youtube.com/watch?v=${videoId}" class="btn">▶ Watch on YouTube</a>` : ""}
+        ${videoId && !p.videoLoop ? `<a href="https://www.youtube.com/watch?v=${videoId}" class="btn">▶ Watch on YouTube</a>` : ""}
         ${p.repo ? `<a href="${p.repo}" class="btn">Code</a>` : ""}
       </div>
     </div>
@@ -90,6 +100,26 @@ function renderFeatured() {
         <h3>${escapeHtml(part.title)}</h3>
         <p>${escapeHtml(part.text)}</p>
       </div>`).join("")}</div>` : ""}`;
+
+  if (videoId && p.videoLoop) startLoopVideo();
+}
+
+// Loads YouTube's player API so the looping video only fades in once it is actually playing
+function startLoopVideo() {
+  window.onYouTubeIframeAPIReady = () => {
+    new YT.Player("loop-video", {
+      events: {
+        onStateChange: e => {
+          if (e.data === YT.PlayerState.PLAYING) {
+            document.querySelector(".video-loop").classList.add("playing");
+          }
+        },
+      },
+    });
+  };
+  const script = document.createElement("script");
+  script.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(script);
 }
 
 function render(category) {

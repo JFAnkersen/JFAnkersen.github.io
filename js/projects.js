@@ -8,6 +8,9 @@
 //              e.g. "img/flight-controller/pcb.jpg" (leave "" for none)
 //   video    : YouTube link or video ID (optional). If there is no image,
 //              the video's YouTube thumbnail is used on the card.
+//   videoLoop: true = on the featured project, play the video silently on
+//              repeat with no YouTube buttons, like a moving picture.
+//              The image is shown until the video starts.
 //   page     : link to a project page (projects/xxx.html) or ""
 //   repo     : link to the GitHub repo or ""
 //   featured : true = shown as the big project at the top of the page
@@ -33,13 +36,14 @@ const PROJECTS = [
     tags: ["STM32", "C", "PID", "KiCad", "DroneCAN", "GPS", "Telemetry"],
     image: "img/flight-controller/fc-photo.jpg",
     imageAlt: "The assembled Universal Quad Controller Rev1 board",
-    video: "",   // e.g. "https://www.youtube.com/watch?v=XXXXXXXXXXX"
+    video: "https://www.youtube.com/watch?v=UeO1raALnfA",
+    videoLoop: true,
     page: "projects/flight-controller.html",
     repo: "https://github.com/JFAnkersen",
     featured: true,
     parts: [
       { image: "img/flight-controller/fc-render-3d.png", title: "Flight controller", text: "STM32 board designed in KiCad: 3S–4S LiPo input, four ESC outputs, GPS, DroneCAN, UART and I²C." },
-      { image: "img/flight-controller/pdb-photo.jpg", title: "Power distribution", text: "Matching PDB that splits the battery to the four ESCs and feeds the flight controller." },
+      { image: "img/flight-controller/frame-base.png", title: "3D-printed frame", text: "Quad frame designed to be fully 3D-printed, with the electronics mounted in the centre." },
       { image: "img/flight-controller/wiring-gps-telemetry.png", title: "Setup & telemetry", text: "From a minimal receiver-only setup to GPS and a wireless link to the bench app." },
     ],
   },

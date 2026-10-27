@@ -98,6 +98,9 @@ so git keeps the folder while it's empty).
 
 ### YouTube videos
 
+Long videos stay on YouTube. Only short, compressed, silent loops (a few MB) belong in the repo:
+GitHub Pages allows about 1 GB in total and 100 MB per file, and git keeps deleted files in its history.
+
 - On a card: set `video` in projects.js.
 - Inside a project page: the `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID">`
   block. Replace `VIDEO_ID` with the 11 characters after `watch?v=` / `youtu.be/`.
@@ -118,6 +121,11 @@ so git keeps the folder while it's empty).
 - Featured project: **Flight Controller** ("Universal Quad Controller Rev1" + a separate PDB,
   two wiring setups: minimal and GPS & wireless telemetry to a laptop "bench app").
   Uses his photos, KiCad renders and wiring diagrams in `img/flight-controller/`.
+  The featured media is his YouTube video (UeO1raALnfA) as a silent loop (`videoLoop: true`);
+  YouTube sometimes still shows its title/buttons over it. He chose to keep it for now. The better fix
+  is a self-hosted short MP4 loop (ffmpeg is installed on this PC); he'd need to export the video
+  from Shotcut first (his Videos folder only has `.mlt` project files).
+  Box 2 under the featured project is the 3D-printed frame (`frame-base.png`).
   The project page has dashed `.todo` paragraphs where his own text is still missing
   (idea, firmware, PDB, bench app, 3D print, results, lessons). No video yet.
 - Full-size originals of his photos are kept in `img/<project>/originals/`, which is git-ignored.
