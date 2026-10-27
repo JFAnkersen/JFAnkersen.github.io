@@ -230,3 +230,8 @@ svg.diagram text.t4 { fill: var(--sim-4); }
    site's gradient-text .accent class: undo that inside formulas */
 .katex .accent { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; }
 .tex .katex { font-size: 1.05em; }
+
+/* Illustration at the top of the page */
+.sim-hero { margin: 24px 0 0; }
+.sim-hero img { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+.sim-hero figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
