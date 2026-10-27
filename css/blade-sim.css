@@ -176,3 +176,57 @@
   .rig { aspect-ratio: 4 / 3; }
   .chart { height: 200px; }
 }
+
+/* ---------- "How it works": equations and diagrams ---------- */
+.theory { max-width: 920px; }
+.theory h3 { margin: 32px 0 8px; font-size: 1.1rem; }
+.theory p { margin: 8px 0; }
+.eq { overflow-x: auto; overflow-y: hidden; padding: 2px 0; color: var(--text); }
+.eq .katex-display { margin: 10px 0; }
+.tex { color: var(--text); }
+
+.fig-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 20px 0; }
+.fig-pair figure {
+  margin: 0;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.fig-pair figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+.fig-pair figcaption strong { color: var(--text); }
+
+svg.diagram { display: block; width: 100%; height: auto; font-family: var(--font); }
+svg.diagram text { fill: var(--muted); font-size: 11px; stroke: none; }
+svg.diagram text.strong { fill: var(--text); font-weight: 600; }
+svg.diagram text.big { font-size: 18px; }
+svg.diagram tspan.sub, svg.diagram tspan.sup { font-size: 8px; }
+svg.diagram path, svg.diagram line { fill: none; }
+svg.diagram .s-text { stroke: var(--text); }
+svg.diagram .s-muted { stroke: var(--muted); }
+svg.diagram .s1 { stroke: var(--sim-1); }
+svg.diagram .s2 { stroke: var(--sim-2); }
+svg.diagram .s3 { stroke: var(--sim-3); }
+svg.diagram .s4 { stroke: var(--sim-4); }
+svg.diagram .f1 { fill: var(--sim-1); }
+svg.diagram .f2 { fill: var(--sim-2); }
+svg.diagram .f3 { fill: var(--sim-3); }
+svg.diagram .f4 { fill: var(--sim-4); }
+svg.diagram .f-surface { fill: var(--surface); }
+svg.diagram .f-bg { fill: var(--bg); }
+svg.diagram .f-none { fill: none; }
+svg.diagram .f-muted { fill: var(--muted); }
+svg.diagram .band { fill: var(--accent-soft); }
+svg.diagram text.t1 { fill: var(--sim-1); }
+svg.diagram text.t2 { fill: var(--sim-2); }
+svg.diagram text.t3 { fill: var(--sim-3); }
+svg.diagram text.t4 { fill: var(--sim-4); }
+
+@media (max-width: 760px) {
+  .fig-pair { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* KaTeX puts dots and hats (ẇ, ẅ) in a span with class "accent", which collides with the
+   site's gradient-text .accent class: undo that inside formulas */
+.katex .accent { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; }
+.tex .katex { font-size: 1.05em; }

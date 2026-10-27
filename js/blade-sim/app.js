@@ -518,8 +518,20 @@ function renderFormatTable() {
     `<tr><td>${col.header}</td><td>${kinds[col.kind]}${col.optional ? ' <span class="opt">(optional)</span>' : ""}</td><td>${col.text}</td></tr>`).join("");
 }
 
+// ---------- Equations ----------
+
+// Typeset every data-tex element with KaTeX. Without KaTeX (offline, blocked CDN) the raw formula is shown.
+function renderMath() {
+  document.querySelectorAll("[data-tex]").forEach((el) => {
+    const tex = el.dataset.tex, display = el.classList.contains("eq");
+    if (window.katex) katex.render(tex, el, { displayMode: display, throwOnError: false });
+    else el.textContent = tex;
+  });
+}
+
 // ---------- Start ----------
 
+renderMath();
 renderFormatTable();
 bindForm();
 bindPlayer();
