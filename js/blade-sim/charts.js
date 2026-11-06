@@ -23,7 +23,7 @@ export function fmt(v, digits = 3) {
   return v.toExponential(1);
 }
 
-function niceTicks(min, max, count = 5) {
+export function niceTicks(min, max, count = 5) {
   const span = max - min || 1;
   const raw = span / count, mag = 10 ** Math.floor(Math.log10(raw));
   const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => span / s <= count) ?? 10 * mag;

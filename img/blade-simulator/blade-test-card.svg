@@ -8,6 +8,8 @@
   .frame { fill: none; stroke: #f2c230; } .frame-edge { fill: none; stroke: #b48c12; } .pad { fill: #8a6d2a; }
   .rod { stroke: #4a515c; } .cyl { stroke: #2f353e; } .base { fill: #59616d; } .base-top { fill: #7a828e; }
   .person { fill: #5b6472; } .helmet { fill: #0a6cff; }
+  .leaf { fill: #2cc4b9; } .leaf-side { fill: #1a9a91; } .leaf-side2 { fill: #22b0a6; }
+  .bal-front { fill: #9aa3af; } .bal-side { fill: #858e9b; } .bal-top { fill: #b3bbc6; }
   .sky-a { stop-color: #f3f6fb; } .sky-b { stop-color: #dfe7f2; }
   @media (prefers-color-scheme: dark) {
     .floor { fill: #2c2923; } .plate { fill: #37332c; } .rail { stroke: #5c5244; }
@@ -16,6 +18,8 @@
     .blade { fill: #e6ecf3; stroke: #8f99a6; } .blade-low { fill: #b9c3cf; } .shadow { opacity: 0.25; }
     .rod { stroke: #9aa4b2; } .cyl { stroke: #c3cad4; } .base { fill: #3b4350; } .base-top { fill: #566070; }
     .person { fill: #8f99a6; } .helmet { fill: #4d9bff; }
+    .leaf { fill: #2cc4b9; } .leaf-side { fill: #168078; } .leaf-side2 { fill: #1d9990; }
+    .bal-front { fill: #4a5361; } .bal-side { fill: #3b4350; } .bal-top { fill: #5b6574; }
     .sky-a { stop-color: #131c2b; } .sky-b { stop-color: #0b0f16; }
   }
 </style>

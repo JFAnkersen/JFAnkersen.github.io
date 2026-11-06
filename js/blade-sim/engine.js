@@ -11,6 +11,11 @@
 //      added as a static correction (mode-acceleration method), so the gravity sag
 //      and the quasi-static part of the exciter response are exact.
 //
+// Optional support beam (used by the Fatigue Test Acceleration Optimizer): a simply supported
+// steel beam under the blade, linked to the blade at one point by a spring (the link rod) at the
+// beam's mid-span. It adds stiffness, so the test frequency goes up. It is assumed to be mounted
+// after the blade has sagged under gravity, so the link carries no static load.
+//
 // Sign convention: deflection w and loads are positive upwards (Flap) or sideways (Edge).
 // Bending moment M(x) = EI·w'' = sum of the loads outboard of x times their lever arm.
 // ------------------------------------------------------------
@@ -159,10 +164,51 @@ function matVec(A, x) {
   return Float64Array.from(A, (row) => dot(row, x));
 }
 
+// The lowest `count` modes of K·phi = lambda·M·phi by subspace iteration. Much faster than
+// solving the full problem when only a few modes are needed (the optimizer builds thousands of models).
+function lowestModes(K, M, Lk, count) {
+  const n = K.length, q = Math.min(n, 2 * count + 4);
+  let seed = 12345;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648) - 0.5;
+  let X = Array.from({ length: q }, (_, j) => Float64Array.from({ length: n }, (_, i) => (j === 0 ? M[i][i] : rnd())));
+  let prev = null, values = null, vectors = null;
+  for (let it = 0; it < 80; it++) {
+    const Y = X.map((x) => cholSolve(Lk, matVec(M, x)));
+    const KY = Y.map((y) => matVec(K, y)), MY = Y.map((y) => matVec(M, y));
+    const Kr = zeros(q), Mr = zeros(q);
+    for (let a = 0; a < q; a++) for (let b = a; b < q; b++) {
+      Kr[a][b] = Kr[b][a] = 0.5 * (dot(Y[a], KY[b]) + dot(Y[b], KY[a]));
+      Mr[a][b] = Mr[b][a] = 0.5 * (dot(Y[a], MY[b]) + dot(Y[b], MY[a]));
+    }
+    const Lr = cholesky(Mr);
+    const T = Kr.map((_, j) => forward(Lr, Float64Array.from(Kr, (row) => row[j])));
+    const Ar = T.map((_, j) => forward(Lr, Float64Array.from(T, (col) => col[j])));
+    const eig = jacobiEigen(Ar);
+    values = eig.values;
+    X = eig.vectors.map((v) => {
+      const z = backward(Lr, v), x = new Float64Array(n);
+      for (let a = 0; a < q; a++) for (let i = 0; i < n; i++) x[i] += z[a] * Y[a][i];
+      return x;
+    });
+    vectors = X;
+    if (prev && values.slice(0, count).every((v, k) => Math.abs(v - prev[k]) <= 1e-12 * Math.abs(v))) break;
+    prev = values;
+  }
+  return { values: values.slice(0, count), vectors: vectors.slice(0, count) };
+}
+
 // ---------- 1. Finite element model ----------
 
-// input: { testType, tilt, span[], mu[], ei[], beta[], clamps:[{pos, mass}], exciters:[{pos, force}] }
-export function buildModel(input, { elements = 40, modes = 3 } = {}) {
+// input: { testType, tilt, span[], mu[], ei[], beta[], clamps:[{pos, mass}], exciters:[{pos, force}],
+//          support (optional): { pos, span, ei, mu, beta, link } }
+//   support.pos  = where the link rod sits on the blade [m]      support.span = beam span [m]
+//   support.ei, support.mu = beam EI [Nm²] and mass [kg/m]       support.beta = beam damping [1/s]
+//   support.link = stiffness of the link rod [N/m]
+//   support.midMass = point mass on the beam at mid-span [kg] (lower end of the link rod, its bearing)
+//   support.taper = true: the width tapers linearly from mid-span to zero at the ends (leaf spring),
+//                   so ei and mu are the mid-span values and the bending stress is the same along the span
+// options.eigen = "subspace" finds only the requested modes (fast); the default solves them all.
+export function buildModel(input, { elements = 40, modes = 3, eigen = "full" } = {}) {
   const x0 = input.span[0];
   const xs = input.span.map((v) => v - x0);           // span measured from the root
   const L = xs[xs.length - 1];
@@ -171,7 +217,15 @@ export function buildModel(input, { elements = 40, modes = 3 } = {}) {
   const betaAt = (x) => Math.max(interp(xs, input.beta, x), 0);
 
   const Ne = elements, h = L / Ne;
-  const n = 2 * Ne;                                   // free DOFs (root deflection and slope are fixed)
+  const nb = 2 * Ne;                                  // free blade DOFs (root deflection and slope are fixed)
+
+  // Support beam DOFs come after the blade's: per node a deflection (not at the two pinned
+  // ends) and a slope. Nsb elements, an even number so the link sits on the mid-span node.
+  const sp = input.support && input.support.pos > 0 && input.support.pos <= L + 1e-9 ? input.support : null;
+  const Nsb = sp ? 8 : 0, hs = sp ? sp.span / Nsb : 0;
+  const sDof = [];                                    // [deflection, slope] DOF of each beam node (-1 = fixed)
+  let n = nb;
+  for (let j = 0; sp && j <= Nsb; j++) sDof.push([j === 0 || j === Nsb ? -1 : n++, n++]);
   const K = zeros(n), M = zeros(n), C = zeros(n);
   const dofs = (e) => [2 * e - 2, 2 * e - 1, 2 * e, 2 * e + 1]; // reduced DOF numbers; < 0 = fixed
 
@@ -206,10 +260,38 @@ export function buildModel(input, { elements = 40, modes = 3 } = {}) {
     addOuter(C, e, N, c.mass * betaAt(c.pos));
   }
 
+  // Support beam: uniform beam elements, then the link spring between the blade and its mid-span
+  const Kblade = sp ? K.slice(0, nb).map((r) => r.slice(0, nb)) : K;   // blade alone, for the gravity sag
+  let link = null;
+  const taperAt = (x) => (sp?.taper ? (2 * Math.min(x, sp.span - x)) / sp.span : 1);   // width / mid-span width
+  if (sp) {
+    for (let e = 0; e < Nsb; e++) {
+      const d = [...sDof[e], ...sDof[e + 1]];
+      const add = (A, N, f) => {
+        for (let a = 0; a < 4; a++) if (d[a] >= 0) for (let b = 0; b < 4; b++) if (d[b] >= 0) A[d[a]][d[b]] += f * N[a] * N[b];
+      };
+      for (const [xi, w] of GAUSS) {
+        const f = taperAt((e + xi) * hs);
+        add(K, shapeDD(xi, hs), w * hs * sp.ei * f);
+        const N = shape(xi, hs);
+        add(M, N, w * hs * sp.mu * f);
+        add(C, N, w * hs * sp.mu * f * (sp.beta ?? 0));
+      }
+    }
+    // Link stretch = w_blade(pos) - w_beam(mid); spring energy ½·k·stretch²
+    const { e, xi } = locate(sp.pos), N = shape(xi, h);
+    const g = new Map();
+    dofs(e).forEach((d, a) => { if (d >= 0) g.set(d, N[a]); });
+    g.set(sDof[Nsb / 2][0], -1);
+    M[sDof[Nsb / 2][0]][sDof[Nsb / 2][0]] += sp.midMass ?? 0;
+    for (const [i, gi] of g) for (const [j, gj] of g) K[i][j] += sp.link * gi * gj;
+    link = { stretch: (u) => { let s = 0; for (const [i, gi] of g) s += gi * u[i]; return s; } };
+  }
+
   // Load vectors: gravity (Flap only) and the exciters at their peak force
   const flap = input.testType === "Flap";
   const gc = flap ? GRAVITY * Math.cos((input.tilt * Math.PI) / 180) : 0;
-  const ones = Float64Array.from({ length: n }, (_, i) => (i % 2 === 0 ? 1 : 0));
+  const ones = Float64Array.from({ length: n }, (_, i) => (i < nb && i % 2 === 0 ? 1 : 0));
   const Fg = matVec(M, ones).map((v) => -gc * v);       // = -g·cos(tilt)·(distributed + clamp masses)
   const exciters = input.exciters.filter((x) => x.pos > 0 && x.pos <= L + 1e-9 && x.force !== 0);
   const Fe = new Float64Array(n);
@@ -218,30 +300,42 @@ export function buildModel(input, { elements = 40, modes = 3 } = {}) {
     for (let a = 0; a < 4; a++) if (d[a] >= 0) Fe[d[a]] += ex.force * N[a];
   }
 
-  // Natural modes: with M = L·L^T, solve the standard problem (L^-1·K·L^-T)·y = lambda·y
-  const Lm = cholesky(M);
-  const X = K.map((_, j) => forward(Lm, Float64Array.from(K, (row) => row[j]))); // columns of L^-1·K
-  const A = X.map((_, j) => forward(Lm, Float64Array.from(X, (col) => col[j])));
-  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) A[i][j] = A[j][i] = 0.5 * (A[i][j] + A[j][i]);
-  const eig = jacobiEigen(A);
+  // Natural modes
+  const Lk = cholesky(K);
+  let eigVals, eigVecs;                               // eigVecs mass-normalised: phi^T·M·phi = 1
+  if (eigen === "subspace" || sp) {               // the stiff steel beam makes the full solve less accurate
+    const sub = lowestModes(K, M, Lk, Math.min(modes, n));
+    eigVals = sub.values;
+    eigVecs = sub.vectors.map((v) => { const s = 1 / Math.sqrt(dot(v, matVec(M, v))); return v.map((x) => x * s); });
+  } else {
+    // With M = L·L^T, solve the standard problem (L^-1·K·L^-T)·y = lambda·y
+    const Lm = cholesky(M);
+    const X = K.map((_, j) => forward(Lm, Float64Array.from(K, (row) => row[j]))); // columns of L^-1·K
+    const A = X.map((_, j) => forward(Lm, Float64Array.from(X, (col) => col[j])));
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) A[i][j] = A[j][i] = 0.5 * (A[i][j] + A[j][i]);
+    const eig = jacobiEigen(A);
+    eigVals = eig.values;
+    eigVecs = eig.vectors.slice(0, modes).map((v) => backward(Lm, v));
+  }
 
   const modeList = [];
   for (let k = 0; k < Math.min(modes, n); k++) {
-    const phi = backward(Lm, eig.vectors[k]);         // mass-normalised: phi^T·M·phi = 1
-    if (phi[n - 2] < 0) phi.forEach((v, i) => (phi[i] = -v)); // tip moves in + direction
-    const omega = Math.sqrt(Math.max(eig.values[k], 0));
+    const phi = eigVecs[k];
+    if (phi[nb - 2] < 0) phi.forEach((v, i) => (phi[i] = -v)); // tip moves in + direction
+    const omega = Math.sqrt(Math.max(eigVals[k], 0));
     const c = dot(phi, matVec(C, phi));
     modeList.push({
       phi, omega, f: omega / (2 * Math.PI), c,
       zeta: c / (2 * omega),
-      g: dot(phi, Fg),                                // modal gravity force
+      g: sp ? 0 : dot(phi, Fg),                       // modal gravity force (none: the support is fitted after the sag)
       e: dot(phi, Fe),                                // modal exciter force (at peak)
     });
   }
 
-  // Static solutions with the full stiffness matrix (the "static correction")
-  const Lk = cholesky(K);
-  const ug = cholSolve(Lk, Fg);
+  // Static solutions with the full stiffness matrix (the "static correction").
+  // With a support, the gravity sag is that of the blade alone.
+  const ug = sp ? new Float64Array(n) : cholSolve(Lk, Fg);
+  if (sp) cholSolve(cholesky(Kblade), Fg.slice(0, nb)).forEach((v, i) => (ug[i] = v));
   const ue = cholSolve(Lk, Fe);
 
   // Evaluate a DOF vector at any x (Hermite interpolation)
@@ -279,24 +373,51 @@ export function buildModel(input, { elements = 40, modes = 3 } = {}) {
     return out;
   };
 
+  // Support: force from the link rod on the blade (as a point load) and the beam's mid-span moment
+  const linkLoad = (u) => (sp ? [{ pos: sp.pos, load: -sp.link * link.stretch(u) }] : []);
+  // endReaction = force on each of the beam's two end supports (link force plus, in a mode, the
+  // beam's own inertia ω²·mu·w and that of the mid-span point mass), positive when it pulls the support upwards
+  const supportOf = (u, w2 = 0) => {
+    if (!sp) return null;
+    const d = [...sDof[Nsb / 2 - 1], ...sDof[Nsb / 2]], B = shapeDD(1, hs);
+    let curv = 0, area = 0;
+    for (let a = 0; a < 4; a++) if (d[a] >= 0) curv += B[a] * u[d[a]];
+    for (let e = 0; e < Nsb; e++) {
+      const de = [...sDof[e], ...sDof[e + 1]];
+      for (const [xi, w] of GAUSS) {
+        const N = shape(xi, hs);
+        const f = taperAt((e + xi) * hs);
+        for (let a = 0; a < 4; a++) if (de[a] >= 0) area += w * hs * f * N[a] * u[de[a]];
+      }
+    }
+    const linkForce = sp.link * link.stretch(u);
+    return {
+      linkForce, beamMoment: sp.ei * curv, beamDeflection: u[sDof[Nsb / 2][0]],
+      endReaction: (linkForce + w2 * (sp.mu * area + (sp.midMass ?? 0) * u[sDof[Nsb / 2][0]])) / 2,
+    };
+  };
+
   const basis = {
     gravity: {
       w: atNodes(ug),
       m: momentOf((x) => -gc * muAt(x), clamps.map((c) => ({ pos: c.pos, load: -gc * c.mass }))),
       atExciters: exciters.map((ex) => valueAt(ug, ex.pos)),
+      support: sp && { linkForce: 0, beamMoment: 0, beamDeflection: 0, endReaction: 0 },
     },
     exciter: {
       w: atNodes(ue),
-      m: momentOf(() => 0, exciters.map((ex) => ({ pos: ex.pos, load: ex.force }))),
+      m: momentOf(() => 0, [...exciters.map((ex) => ({ pos: ex.pos, load: ex.force })), ...linkLoad(ue)]),
       atExciters: exciters.map((ex) => valueAt(ue, ex.pos)),
+      support: supportOf(ue),
     },
     modes: modeList.map((md) => {
       const w2 = md.omega * md.omega;
       return {
         w: atNodes(md.phi),
         m: momentOf((x) => w2 * muAt(x) * valueAt(md.phi, x),
-          clamps.map((c) => ({ pos: c.pos, load: w2 * c.mass * valueAt(md.phi, c.pos) }))),
+          [...clamps.map((c) => ({ pos: c.pos, load: w2 * c.mass * valueAt(md.phi, c.pos) })), ...linkLoad(md.phi)]),
         atExciters: exciters.map((ex) => valueAt(md.phi, ex.pos)),
+        support: supportOf(md.phi, w2),
       };
     }),
   };
@@ -312,7 +433,7 @@ export function buildModel(input, { elements = 40, modes = 3 } = {}) {
 
   return {
     L, h, elements: Ne, flap, gc, nodesX, modes: modeList, shapes, basis,
-    clamps, exciters, mass,
+    clamps, exciters, mass, support: sp,
     eiAt, muAt,
   };
 }

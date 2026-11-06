@@ -1,11 +1,15 @@
 // Generic 3D-style picture of a blade fatigue test for the project card on the front page:
 // test stand with root flange, blade, clamp frame and a blade exciter down to the floor. No labels.
 // Writes img/blade-simulator/blade-test-card.svg (1600 x 900).
-// Not part of the site. Run with:  node tools/blade-sim-card-svg.mjs
+// With --support it adds a glass-fibre leaf spring under the blade, linked to it by a rod, and writes
+// img/test-optimizer/test-optimizer-card.svg instead (the Fatigue Test Acceleration Optimizer's card).
+// Not part of the site. Run with:  node tools/blade-sim-card-svg.mjs [--support]
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const out = process.argv[2] ?? fileURLToPath(new URL("../img/blade-simulator/blade-test-card.svg", import.meta.url));
+const SUPPORT = process.argv.includes("--support");
+const out = process.argv.slice(2).find((a) => a.endsWith(".svg")) ??
+  fileURLToPath(new URL(SUPPORT ? "../img/test-optimizer/test-optimizer-card.svg" : "../img/blade-simulator/blade-test-card.svg", import.meta.url));
 const W = 1600, H = 900;
 const r = (v) => Math.round(v * 10) / 10;
 
@@ -46,9 +50,14 @@ const shadow = [];
 for (let i = 0; i <= N; i++) { const s = 0.02 + (0.98 * i) / N; shadow.push(P(s * L, 0, -chord(s) * 0.9 + 60)); }
 for (let i = N; i >= 0; i--) { const s = 0.02 + (0.98 * i) / N; shadow.push(P(s * L, 0, chord(s) * 0.9 + 60)); }
 
-// Clamp frame around the blade
-const XC = 0.6 * L, cz = chord(0.6) + 40, cy0 = YC + sag(0.6) - thick(0.6) - 46, cy1 = YC + sag(0.6) + thick(0.6) + 46;
-const frame = (x) => [[x, cy0, -cz], [x, cy1, -cz], [x, cy1, cz], [x, cy0, cz]];
+// Clamp frame around the blade (at the exciter; with --support also at the link rod)
+const SC = SUPPORT ? 0.45 : 0.6, SS = 0.84;
+const frameAt = (sp) => {
+  const cz = chord(sp) + 40, cy0 = YC + sag(sp) - thick(sp) - 46, cy1 = YC + sag(sp) + thick(sp) + 46;
+  return { x: sp * L, cz, cy0, cy1, pts: (x) => [[x, cy0, -cz], [x, cy1, -cz], [x, cy1, cz], [x, cy0, cz]] };
+};
+const F1 = frameAt(SC), F2 = frameAt(SS);
+const XC = F1.x, cz = F1.cz, cy0 = F1.cy0, cy1 = F1.cy1, frame = F1.pts;
 
 // Round flange on the stand (in the Y-Z plane at X = 0)
 const ring = (rad, x = 0, yc = YC, n = 64) =>
@@ -58,7 +67,7 @@ const ring = (rad, x = 0, yc = YC, n = 64) =>
 const disc = (x, z, rad, y = 0, n = 64) =>
   Array.from({ length: n }, (_, i) => { const a = (2 * Math.PI * i) / n; return P(x + rad * Math.cos(a), y, z + rad * Math.sin(a)); });
 
-let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="A wind turbine blade in a fatigue test: the root is bolted to a large test stand, and a clamp on the blade is connected to a blade exciter on the floor">
+let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="A wind turbine blade in a fatigue test: the root is bolted to a large test stand, and a clamp on the blade is connected to a blade exciter on the floor${SUPPORT ? ". Further out, a rod links the blade to a glass-fibre leaf spring on two supports" : ""}">
 <title>Blade fatigue test</title>
 <style>
   .sky { fill: url(#sky); } .floor { fill: #ddd5c7; } .plate { fill: #ece7de; } .rail { stroke: #a99d89; }
@@ -68,6 +77,8 @@ let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="i
   .frame { fill: none; stroke: #f2c230; } .frame-edge { fill: none; stroke: #b48c12; } .pad { fill: #8a6d2a; }
   .rod { stroke: #4a515c; } .cyl { stroke: #2f353e; } .base { fill: #59616d; } .base-top { fill: #7a828e; }
   .person { fill: #5b6472; } .helmet { fill: #0a6cff; }
+  .leaf { fill: #2cc4b9; } .leaf-side { fill: #1a9a91; } .leaf-side2 { fill: #22b0a6; }
+  .bal-front { fill: #9aa3af; } .bal-side { fill: #858e9b; } .bal-top { fill: #b3bbc6; }
   .sky-a { stop-color: #f3f6fb; } .sky-b { stop-color: #dfe7f2; }
   @media (prefers-color-scheme: dark) {
     .floor { fill: #2c2923; } .plate { fill: #37332c; } .rail { stroke: #5c5244; }
@@ -76,6 +87,8 @@ let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="i
     .blade { fill: #e6ecf3; stroke: #8f99a6; } .blade-low { fill: #b9c3cf; } .shadow { opacity: 0.25; }
     .rod { stroke: #9aa4b2; } .cyl { stroke: #c3cad4; } .base { fill: #3b4350; } .base-top { fill: #566070; }
     .person { fill: #8f99a6; } .helmet { fill: #4d9bff; }
+    .leaf { fill: #2cc4b9; } .leaf-side { fill: #168078; } .leaf-side2 { fill: #1d9990; }
+    .bal-front { fill: #4a5361; } .bal-side { fill: #3b4350; } .bal-top { fill: #5b6574; }
     .sky-a { stop-color: #131c2b; } .sky-b { stop-color: #0b0f16; }
   }
 </style>
@@ -100,6 +113,27 @@ s += `<path d="${path(ring(98))}" class="root" stroke-width="2"/>`;
 
 // Shadow, blade, clamp frame
 s += `<path d="${path(shadow)}" class="shadow"/>`;
+if (SUPPORT) {
+  // Leaf spring: diamond-shaped plate (seen from above) on two supports with ballast, under the outer blade
+  const XS = F2.x, SP = 210, ys = 150, t = 14, wz = 85;
+  const box = (x0, x1, y0, y1, z0, z1, cls) => {
+    s += `<path d="${poly([[x1, y0, z1], [x0, y0, z1], [x0, y1, z1], [x1, y1, z1]])}" class="${cls}-side edge" stroke-width="2"/>`;
+    s += `<path d="${poly([[x1, y0, z0], [x1, y0, z1], [x1, y1, z1], [x1, y1, z0]])}" class="${cls}-front edge" stroke-width="2"/>`;
+    s += `<path d="${poly([[x1, y1, z0], [x1, y1, z1], [x0, y1, z1], [x0, y1, z0]])}" class="${cls}-top edge" stroke-width="2"/>`;
+  };
+  for (const xe of [XS + SP, XS - SP]) {
+    box(xe - 70, xe + 70, 0, 46, -90, 90, "bal");
+    box(xe - 22, xe + 22, 46, ys - t, -34, 34, "blk");
+  }
+  const a = [XS - SP, ys, 0], n = [XS, ys, -wz], b = [XS + SP, ys, 0], f = [XS, ys, wz];
+  const down = ([x, y, z]) => [x, y - t, z];
+  s += `<path d="${poly([f, b, down(b), down(f)])}" class="leaf-side"/>`;
+  s += `<path d="${poly([a, f, down(f), down(a)])}" class="leaf-side2"/>`;
+  s += `<path d="${poly([a, n, b, f])}" class="leaf"/>`;
+  const [rx0, ry0] = P(XS, ys, 0), [rx1, ry1] = P(XS, F2.cy0 - 14, 0);
+  s += `<line x1="${r(rx0)}" y1="${r(ry0)}" x2="${r(rx1)}" y2="${r(ry1)}" class="rod" stroke-width="12" stroke-linecap="round"/>`;
+  s += `<path d="${poly(F2.pts(XS - 40))}" class="frame-edge" stroke-width="30" stroke-linejoin="round"/>`;
+}
 s += `<path d="${poly(frame(XC - 40))}" class="frame-edge" stroke-width="30" stroke-linejoin="round"/>`;
 s += `<path d="${bladeOutline}" class="blade" stroke-width="2"/>`;
 s += `<path d="${bladeLower}" class="blade-low"/>`;
@@ -107,6 +141,7 @@ s += `<path d="${path([...top, tipPt, ...[...bot].reverse()])}" fill="none" clas
 s += `<path d="${poly([[XC, cy0 + 10, -cz + 18], [XC, cy0 + 10, cz - 18], [XC, cy0 + 30, cz - 18], [XC, cy0 + 30, -cz + 18]])}" class="pad"/>`;
 s += `<path d="${poly([[XC, cy1 - 10, -cz + 18], [XC, cy1 - 10, cz - 18], [XC, cy1 - 30, cz - 18], [XC, cy1 - 30, -cz + 18]])}" class="pad"/>`;
 s += `<path d="${poly(frame(XC))}" class="frame" stroke-width="30" stroke-linejoin="round"/>`;
+if (SUPPORT) s += `<path d="${poly(F2.pts(F2.x))}" class="frame" stroke-width="30" stroke-linejoin="round"/>`;
 
 // Blade exciter: base disc on the floor, cylinder and rod up to the clamp
 s += `<path d="${path(disc(XC, 0, 120))}" class="base"/>`;

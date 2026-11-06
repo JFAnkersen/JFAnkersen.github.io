@@ -45,6 +45,26 @@ const uniform = (extra) => ({
   check("tip load root moment", m.basis.exciter.m[0], P * L, 1e-9);
 }
 
+// 3b. Support beam (optimizer): a near-rigid support at the tip gives a propped cantilever,
+//     (βL)² = 3.9266², and a flexible one acts as the link and beam springs in series
+{
+  const rigid = buildModel(uniform({ testType: "Edge", support: { pos: L, span: 4, ei: 1e11, mu: 50, beta: 0, link: 1e9 } }));
+  check("propped cantilever mode 1", rigid.modes[0].f, (3.926602 ** 2) / (2 * Math.PI * L * L) * Math.sqrt(EI / mu), 1e-4);
+  const P = 1000, span = 6, eiB = 2e8, link = 5e5;
+  const kSupport = 1 / (1 / ((48 * eiB) / span ** 3) + 1 / link);
+  const m = buildModel(uniform({ testType: "Edge", exciters: [{ pos: L, force: P }], support: { pos: L, span, ei: eiB, mu: 100, beta: 0, link } }));
+  const wTip = P / ((3 * EI) / L ** 3 + kSupport), R = kSupport * wTip;
+  check("supported tip deflection", m.basis.exciter.w.at(-1), wTip, 1e-9);
+  check("supported root moment", m.basis.exciter.m[0], (P - R) * L, 1e-9);
+  check("support beam mid-span moment", -m.basis.exciter.support.beamMoment, (R * span) / 4, 1e-9);
+  // Leaf spring (width tapering to zero at the ends): k = 32·E·I0 / l³
+  const leaf = buildModel(uniform({ testType: "Edge", exciters: [{ pos: L, force: P }], support: { pos: L, span, ei: eiB, mu: 100, beta: 0, link: 1e12, taper: true } }));
+  const sl = leaf.basis.exciter.support;
+  check("leaf spring stiffness", sl.linkForce / sl.beamDeflection, (32 * eiB) / span ** 3, 1e-6);
+  const sub = buildModel(uniform({ testType: "Edge" }), { eigen: "subspace" });
+  check("subspace eigen solver, mode 3", sub.modes[2].f, buildModel(uniform({ testType: "Edge" })).modes[2].f, 1e-9);
+}
+
 // 4. Time simulation reaches the steady-state amplitude of the resonance curve
 {
   const input = uniform({ testType: "Edge", beta: [0.5, 0.5], exciters: [{ pos: 7, force: 500 }] });

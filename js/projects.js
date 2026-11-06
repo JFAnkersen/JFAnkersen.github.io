@@ -60,6 +60,17 @@ const PROJECTS = [
     featured: false,
   },
   {
+    title: "Fatigue Test Acceleration Optimizer",
+    summary: "Shortens a blade fatigue test with a glass-fibre spring under the blade: finds the spring, tunes the clamp masses and writes a workshop spec for the beam.",
+    category: "control",
+    tags: ["Optimisation", "FEM", "Composites", "Fatigue testing", "JavaScript"],
+    image: "img/test-optimizer/test-optimizer-card.svg",
+    imageAlt: "Drawing of a wind turbine blade in a test stand with a blade exciter, and further out a rod down to a glass-fibre leaf spring on two supports",
+    page: "projects/test-optimizer.html",
+    repo: "",
+    featured: false,
+  },
+  {
     title: "Retro AC Valve Floor Heater",
     summary: "8-channel floor heating controller that drives existing 230 V AC valves and the pump, with one knob per room.",
     category: "household",

@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fatigue Test Acceleration Optimizer | J.F. Ankersen</title>
+  <meta name="description" content="Shorten a wind turbine blade fatigue test with a glass-fibre spring under the blade: find the support, tune the clamp masses and get a workshop spec for the beam.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/blade-sim.css">
+  <link rel="stylesheet" href="../css/test-optimizer.css">
+  <!-- KaTeX: typesets the equations in "How it works" -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+        integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="../index.html" class="logo">JF<span>Ankersen</span></a>
+      <nav>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container sim-page">
+    <a href="../index.html#projects" class="back">← All projects</a>
+    <p class="eyebrow">Optimisation · Structural dynamics · Test engineering</p>
+    <h1>Fatigue Test Acceleration Optimizer</h1>
+    <p class="lead">
+      A full-scale fatigue test of a wind turbine blade runs millions of cycles at the blade's first natural
+      frequency, which can take months. A glass-fibre spring under the blade raises that frequency, so the test
+      finishes sooner. This tool finds where to put the spring and how stiff it should be, tunes the clamp masses
+      so the bending moment still matches the target, and turns the result into a spec the workshop can build.
+    </p>
+    <ul class="tags">
+      <li>Optimisation</li><li>Finite elements</li><li>Modal analysis</li><li>Composites</li><li>Fatigue testing</li><li>JavaScript</li>
+    </ul>
+
+    <figure class="sim-hero">
+      <img src="../img/test-optimizer/support-rig.svg" width="1600" height="900"
+           alt="Drawing of a wind turbine blade bolted to a test stand, with a blade exciter on the ground at one clamp and, further out, a link rod from a second clamp down to the middle of a glass-fibre leaf spring. The leaf spring rests on two supports with ballast.">
+      <figcaption>The idea: a glass-fibre leaf spring under the blade, linked to it by a rod, adds stiffness. The blade swings faster, and the ballast on each support keeps the spring from lifting.</figcaption>
+    </figure>
+
+    <!-- ===== 1. Blade and target ===== -->
+    <section class="sim-section" id="input">
+      <div class="sim-head">
+        <h2><span class="step">1</span> Blade and target load</h2>
+      </div>
+
+      <div class="sim-panel source" id="drop-zone">
+        <div class="source-actions">
+          <button class="btn btn-primary" id="btn-generic" type="button">Generic blade (NREL 5 MW)</button>
+          <label class="btn" for="file-input">Open your own file…</label>
+          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.txt" hidden>
+        </div>
+        <p class="source-info" id="source-info"></p>
+        <p class="hint">Same file format as the <a href="blade-simulator.html#format">Blade Fatigue Test Simulator</a>, with the
+          target bending moment in the column <code>Target Mom [kNm]</code>. A few points (e.g. root plus three stations) are enough:
+          the target is interpolated between them. Your file is read in your browser and is never uploaded.</p>
+        <div class="messages" id="messages" hidden></div>
+      </div>
+
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>Test</h3>
+          <div class="form">
+            <div class="field wide">
+              <span class="label">Test type</span>
+              <div class="segmented" role="radiogroup" aria-label="Test type">
+                <button type="button" data-type="Flap" role="radio">Flapwise</button>
+                <button type="button" data-type="Edge" role="radio">Edgewise</button>
+              </div>
+            </div>
+            <label class="field">
+              <span class="label">Load cycles <span class="unit">[million]</span></span>
+              <input type="number" id="cycles" step="0.5" min="0.1" data-key="cycles" data-scale="1e6">
+            </label>
+            <label class="field">
+              <span class="label">Allowed overload <span class="unit">[%]</span></span>
+              <input type="number" id="overload" step="1" min="0" data-key="overloadMax" data-scale="0.01">
+            </label>
+            <label class="field">
+              <span class="label">Test zone from <span class="unit">[% of length]</span></span>
+              <input type="number" id="zone-start" step="5" min="0" max="95" data-key="zoneStart" data-scale="0.01">
+            </label>
+            <label class="field">
+              <span class="label">Test zone to <span class="unit">[% of length]</span></span>
+              <input type="number" id="zone-end" step="5" min="5" max="100" data-key="zoneEnd" data-scale="0.01">
+            </label>
+          </div>
+          <p class="hint">In the test zone the bending moment must reach the target everywhere and may exceed it by at most the allowed overload.</p>
+          <h4>Clamps on the blade <span class="unit">(the optimizer tunes their masses)</span></h4>
+          <table class="edit-table" id="clamp-table">
+            <thead><tr><th>Position [m]</th><th>Mass in file [kg]</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="hint" id="exciter-info"></p>
+        </div>
+
+        <div class="sim-panel">
+          <h3>Target bending moment</h3>
+          <dl class="mini-stats" id="blade-stats"></dl>
+          <canvas class="chart" id="chart-target" aria-label="Target bending moment along the blade, with the test zone"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 2. Limits ===== -->
+    <section class="sim-section" id="limits">
+      <div class="sim-head">
+        <h2><span class="step">2</span> Exciter and spring</h2>
+      </div>
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>Exciter limits</h3>
+          <div class="form">
+            <label class="field">
+              <span class="label">Max force <span class="unit">[kN]</span></span>
+              <input type="number" step="1" min="0" data-key="maxForce" data-scale="1e3">
+            </label>
+            <label class="field">
+              <span class="label">Max stroke <span class="unit">[± m]</span></span>
+              <input type="number" step="0.05" min="0" data-key="maxStroke" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Max power <span class="unit">[kW]</span></span>
+              <input type="number" step="1" min="0" data-key="maxPower" data-scale="1e3">
+            </label>
+            <label class="field">
+              <span class="label">Damping</span>
+              <select data-key="dampingModel">
+                <option value="constant">Same damping ratio as without spring</option>
+                <option value="input">β from the file</option>
+              </select>
+            </label>
+          </div>
+          <p class="hint">Force, stroke and power are the steady values at resonance, with the moment scaled to the target.</p>
+        </div>
+
+        <div class="sim-panel">
+          <h3>Glass-fibre spring</h3>
+          <div class="form">
+            <label class="field">
+              <span class="label">Shape</span>
+              <select data-key="shape">
+                <option value="leaf">Leaf spring (width tapers to the ends)</option>
+                <option value="prismatic">Constant width</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="label">E-modulus <span class="unit">[GPa]</span></span>
+              <input type="number" step="1" min="1" data-key="E" data-scale="1e9">
+            </label>
+            <label class="field">
+              <span class="label">Allowed stress amplitude <span class="unit">[MPa]</span></span>
+              <input type="number" step="5" min="1" data-key="stressAmp" data-scale="1e6">
+            </label>
+            <label class="field">
+              <span class="label">Density <span class="unit">[kg/m³]</span></span>
+              <input type="number" step="50" min="100" data-key="density" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Width at mid-span <span class="unit">[m]</span></span>
+              <input type="number" step="0.1" min="0.05" data-key="width" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Max span <span class="unit">[m]</span></span>
+              <input type="number" step="1" min="1" data-key="maxSpan" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Max spring mass <span class="unit">[t]</span></span>
+              <input type="number" step="0.5" min="0" data-key="maxBeamMass" data-scale="1e3">
+            </label>
+            <label class="field">
+              <span class="label">Link rod stiffness <span class="unit">[MN/m]</span></span>
+              <input type="number" step="5" min="1" data-key="link" data-scale="1e6">
+            </label>
+            <label class="field">
+              <span class="label">Yoke on the blade <span class="unit">[kg]</span></span>
+              <input type="number" step="50" min="0" data-key="yokeMass" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Steel rod length <span class="unit">[m]</span></span>
+              <input type="number" step="0.1" min="0" data-key="rodLength" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Steel rod diameter <span class="unit">[mm]</span></span>
+              <input type="number" step="5" min="10" data-key="rodDiameter" data-scale="1e-3">
+            </label>
+            <label class="field">
+              <span class="label">Spherical bearing, each <span class="unit">[kg]</span></span>
+              <input type="number" step="5" min="0" data-key="bearingMass" data-scale="1">
+            </label>
+            <label class="field">
+              <span class="label">Safety factor on uplift</span>
+              <input type="number" step="0.1" min="1" data-key="safetyFactor" data-scale="1">
+            </label>
+          </div>
+          <p class="hint">Defaults are typical for unidirectional pultruded glass fibre (GFRP). The allowed stress amplitude is for the
+            whole test, including safety. Get the real value from the material supplier's S-N curve.</p>
+        </div>
+      </div>
+      <div class="run-bar">
+        <button class="btn btn-primary" id="btn-run" type="button">Run optimization</button>
+        <div class="progress" id="progress" hidden><span id="progress-bar"></span></div>
+        <p class="muted small" id="run-info"></p>
+      </div>
+    </section>
+
+    <!-- ===== 3. Results ===== -->
+    <section class="sim-section" id="results">
+      <div class="sim-head">
+        <h2><span class="step">3</span> Test time versus exciter power</h2>
+      </div>
+      <div class="stat-row" id="result-stats"></div>
+      <div class="sim-grid two">
+        <div class="sim-panel">
+          <h3>All designs <span class="unit">click a point to select it</span></h3>
+          <canvas class="chart tall" id="chart-pareto" aria-label="Scatter plot of test time against exciter power for every spring design"></canvas>
+          <p class="hint">Each point is one spring position and stiffness, with its own tuned clamp masses and sized beam.
+            Grey points break a limit (hover to see which). The line is the best trade-off: nothing is both faster and needs less power.</p>
+        </div>
+        <div class="sim-panel">
+          <h3>Bending moment of the selected design</h3>
+          <canvas class="chart tall" id="chart-moment" aria-label="Bending moment amplitude along the blade for the selected design, the test without spring and the target"></canvas>
+          <div class="messages" id="design-messages" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 4. Workshop spec ===== -->
+    <section class="sim-section" id="spec">
+      <div class="sim-head">
+        <h2><span class="step">4</span> Workshop spec</h2>
+        <div class="source-actions">
+          <button class="btn small" id="btn-spec" type="button">Download spec (.txt)</button>
+          <button class="btn small" id="btn-print" type="button">Print</button>
+        </div>
+      </div>
+      <div class="sim-panel spec-sheet" id="spec-sheet">
+        <p class="muted">Run the optimization to get a spec.</p>
+      </div>
+    </section>
+
+    <!-- ===== How it works ===== -->
+    <section class="sim-section theory" id="about">
+      <h2>How it works</h2>
+      <p class="muted">
+        The blade, the clamps and the spring are one finite-element model, built with the same engine as the
+        <a href="blade-simulator.html">Blade Fatigue Test Simulator</a>. The spring is a beam on two supports, linked to the blade
+        by a rod at its mid-span. It is fitted after the blade has sagged under its own weight, so it only carries the test load.
+      </p>
+
+      <h3>1. Why a spring makes the test faster</h3>
+      <p class="muted">The test runs at the first natural frequency. A spring of stiffness <span class="tex" data-tex="k"></span> at the position <span class="tex" data-tex="x_s"></span> raises it roughly as</p>
+      <div class="eq" data-tex="\omega_1^2 \;\approx\; \frac{\boldsymbol\varphi^{\mathsf T}\mathbf K\,\boldsymbol\varphi \;+\; k\,\varphi(x_s)^2}{\boldsymbol\varphi^{\mathsf T}\mathbf M\,\boldsymbol\varphi \;+\; m_s\,\varphi(x_s)^2}, \qquad t_\text{test} = \frac{N_\text{cycles}}{f_1}"></div>
+      <p class="muted">
+        where <span class="tex" data-tex="m_s"></span> is the mass that moves with the spring (its clamp and part of the beam). The tool solves the full eigenproblem
+        instead of this estimate, but it shows the trade-off: more stiffness is faster, more moving mass is slower.
+      </p>
+
+      <h3>2. Fitting the target moment</h3>
+      <p class="muted">At resonance the blade swings in mode 1. The moment amplitude is the mode's moment <span class="tex" data-tex="M_1(x)"></span> times an amplitude <span class="tex" data-tex="a"></span>, chosen so the target is reached everywhere in the test zone:</p>
+      <div class="eq" data-tex="a = \max_{x\,\in\,\text{zone}} \frac{M_\text{target}(x)}{M_1(x)}, \qquad \text{overload} = \max_{x\,\in\,\text{zone}} \frac{a\,M_1(x)}{M_\text{target}(x)} - 1"></div>
+      <p class="muted">
+        The spring pushes back on the blade, which lowers the moment inboard of it. So for each spring the clamp masses are tuned
+        (a coordinate search over standard masses) to bring the moment curve back to the target with the least exciter power.
+      </p>
+
+      <h3>3. Exciter force, stroke and power</h3>
+      <div class="eq" data-tex="F = \frac{2\zeta_1\,\omega_1^2\,a}{\varphi(x_e)}, \qquad \text{stroke} = a\,\varphi(x_e), \qquad P = \zeta_1\,\omega_1^3\,a^2"></div>
+      <p class="muted">
+        with the mode mass-normalised and <span class="tex" data-tex="x_e"></span> the exciter position. Higher frequency means more power for the same swing,
+        which is the price of the shorter test.
+      </p>
+
+      <h3>4. Sizing the glass-fibre spring</h3>
+      <p class="muted">
+        A beam of span <span class="tex" data-tex="l"></span> and rectangular section <span class="tex" data-tex="b \times h"></span>, loaded at mid-span, deflecting
+        <span class="tex" data-tex="\pm\delta"></span>:
+      </p>
+      <div class="eq" data-tex="k = \frac{C\,E\,I}{l^3}, \qquad I = \frac{b\,h^3}{12}, \qquad \sigma = \frac{M\,h}{2I} = \frac{D\,E\,\delta\,h}{l^2}"></div>
+      <p class="muted">
+        with <span class="tex" data-tex="C = 48,\ D = 6"></span> for a constant width and <span class="tex" data-tex="C = 32,\ D = 4"></span> for a leaf spring whose width
+        tapers from <span class="tex" data-tex="b"></span> at mid-span to zero at the supports. Setting <span class="tex" data-tex="\sigma"></span> to the allowed stress amplitude gives
+        the shortest beam, and its mass:
+      </p>
+      <div class="eq" data-tex="h = \left(\frac{12\,k}{C\,E\,b}\right)^{2/3}\frac{D\,E\,\delta}{\sigma}, \qquad l = \sqrt{\frac{D\,E\,\delta\,h}{\sigma}}, \qquad m_\text{beam} = \frac{(9 \text{ or } 3)\,\rho\,E\,k\,\delta^2}{\sigma^2}"></div>
+      <p class="muted">
+        The mass does not depend on the width, so the width is a practical choice. It does depend on the energy the spring has to store,
+        <span class="tex" data-tex="\tfrac12 k\delta^2"></span>: a stiff spring far out on the blade quickly gets heavy. The leaf spring has the same stress along its whole
+        length, so it needs a third of the material. If the span limit is reached, the beam is made wider and thinner instead.
+        The beam is then put back into the model with its own mass, and the clamp tuning and sizing are repeated until they agree.
+      </p>
+
+      <h3>5. Holding the supports down</h3>
+      <p class="muted">When the blade swings up, the rod pulls the spring up and each support is pulled up by</p>
+      <div class="eq" data-tex="R = \tfrac12\left(F_\text{rod} + \omega_1^2\Big(\int \mu_\text{beam}\,w\,dx + m_\text{low}\,w_\text{mid}\Big)\right), \qquad m_\text{support} \ge \frac{S\,R}{g}"></div>
+      <p class="muted">
+        with the safety factor <span class="tex" data-tex="S"></span> (default 2). The link hardware is included as assumed point masses: the yoke on the blade,
+        the upper spherical bearing and half the steel rod move with the blade; the lower bearing and the other half of the rod
+        (<span class="tex" data-tex="m_\text{low}"></span>) move with the spring's mid-span. The weight of the beam and the lower hardware counts,
+        so the ballast to add is that minus half of it.
+      </p>
+
+      <p class="muted">
+        Assumptions: linear and small deflections, one bending plane, the supports are rigid, the spring has one pinned end and one end that can slide,
+        and the test is at steady resonance in mode 1. Results are a design starting point: check the chosen set-up in a time simulation and with the material data.
+      </p>
+      <p class="muted small">
+        The idea of adding springs to raise the test frequency is described in a 2020 paper in Wind Energy Science:
+        <a href="https://wes.copernicus.org/articles/5/675/2020/">A novel rotor blade fatigue test setup with elliptical biaxial resonant excitation</a>.
+        Generic blade: the public NREL 5 MW reference blade (NREL/TP-500-38060, data from the
+        <a href="https://github.com/OpenFAST/r-test">OpenFAST r-test</a> repository, Apache 2.0). Its target moment, clamps and exciter are my own example values.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© J.F. Ankersen</div>
+  </footer>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+          integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+  <script type="module" src="../js/test-optimizer/app.js"></script>
+</body>
+</html>

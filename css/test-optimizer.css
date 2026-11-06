@@ -1,0 +1,41 @@
+/* ---------- Fatigue Test Acceleration Optimizer (projects/test-optimizer.html) ----------
+   Builds on css/blade-sim.css (panels, forms, stats, charts) */
+
+.sim-page code { font-family: var(--mono); font-size: 0.85em; }
+.chart.tall { height: 300px; }
+
+.run-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 16px; }
+.run-bar .btn { cursor: pointer; font: inherit; font-weight: 600; }
+.run-bar .btn:disabled { opacity: 0.6; cursor: progress; }
+.run-bar p { margin: 0; }
+.progress { flex: 1 1 200px; max-width: 360px; height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+.progress[hidden] { display: none; }
+
+/* Workshop spec */
+.spec-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.spec-grid svg.diagram { max-width: 620px; }
+.spec-grid svg.diagram text { font-size: 12px; }
+.spec-tables { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; align-items: start; }
+.spec-sheet h4 { margin: 0 0 6px; font-size: 0.92rem; }
+.spec-sheet h4:not(:first-child) { margin-top: 18px; }
+.spec-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.spec-table th, .spec-table td { text-align: left; vertical-align: top; padding: 5px 8px 5px 0; border-bottom: 1px solid var(--border); }
+.spec-table th { font-weight: 500; color: var(--muted); width: 45%; }
+.spec-table td { font-weight: 600; }
+.spec-warn { margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; background: color-mix(in srgb, var(--sim-4) 14%, transparent); }
+
+@media (max-width: 860px) {
+  .spec-tables { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .chart.tall { height: 260px; }
+  .spec-table th { width: 50%; }
+}
+
+/* Print only the spec */
+@media print {
+  .site-header, .site-footer, .back, .eyebrow, .lead, .tags, .sim-hero, #input, #limits, #results, #about, #spec .source-actions { display: none !important; }
+  .sim-page { padding: 0; }
+  .spec-sheet { box-shadow: none; border: 0; }
+}
